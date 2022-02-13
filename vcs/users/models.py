@@ -9,9 +9,6 @@ class Profile(models.Model):
     def __str__(self): #how we want profile to be displayed
         return f'{self.user.username} Profile'
 
-   # def save(self): #overriding save method
-      #  super().save()
-
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
 
