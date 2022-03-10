@@ -1,0 +1,21 @@
+{% extends 'git/base.html' %}
+
+{% block content %}
+<h5>New project</h5>
+<form method="post" action="{% url 'new-project' %}">
+    {% csrf_token %}
+        <div class="row">
+        <div class="col-12 mb-2">
+            <p>Title:</p>
+            <input type="text" name="title" class="w-50">
+        </div>
+        <div class="col-12 mb-2">
+            <p>Git repository:</p>
+            <input type="text" name="git_repo" class="w-50">
+        </div>
+        <div class="col-12">
+            <input type="submit" class="btn btn-success" value="new_project">
+        </div>
+    </div>
+</form>
+{% endblock %}
