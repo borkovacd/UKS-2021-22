@@ -1,5 +1,7 @@
 from django.contrib.auth.models import User
 from django.db import models
+from django.urls import reverse
+
 
 # Create your models here.
 GENERAL_STATES = (
@@ -10,11 +12,17 @@ GENERAL_STATES = (
 
 class Project(models.Model):
     title = models.CharField(max_length=32)
-    contributors = models.ManyToManyField(User)
-    git_repo = models.CharField(max_length=100, default='')
+    description = models.CharField(max_length=100)
+    git_repo = models.CharField(max_length=100)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='projects') #if the user us deleted, delete the project too
+    collaborators = models.ManyToManyField(User)
 
     def __str__(self):
         return str(self.title)
+    
+    def get_absolute_url(self):
+        return reverse('project-detail', kwargs={'pk': self.pk})
+
 
 class Milestone(models.Model):
     title = models.CharField(max_length=200, blank=False)
