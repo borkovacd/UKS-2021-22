@@ -1,0 +1,16 @@
+{% extends "git/base.html" %} {% block content %}
+<article class="media content-section">
+  <img class="rounded-circle article-img" src="{{ object.owner.profile.image.url }}" />
+  <div class="media-body">
+    <div class="article-metadata">
+      <span><i>owner: </i></span><a class="mr-2" href="{% url 'profile' %}">{{ object.owner }}</a>
+      {% if object.owner == user %}
+      <div></div>
+      {% endif %}
+    </div>
+    <h2 class="article-title">{{ object.name }}</h2>
+    <p class="article-content"><i>{{ object.description }}</i></p>
+    <a class="mr-2" href="{{ object.git_repo}}">View in GitHub</a>
+  </div>
+</article>
+{% endblock content %}

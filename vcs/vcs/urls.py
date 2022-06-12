@@ -1,4 +1,4 @@
-"""tiny_git URL Configuration
+""" URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/3.1/topics/http/urls/
@@ -21,7 +21,7 @@ from django.conf.urls.static import static
 from users import views as user_views
 
 urlpatterns = [
-    path('vcs/', include('git.urls')),
+    path('', include('git.urls')),
     path('admin/', admin.site.urls),
     path('register/', user_views.register, name="register"),
     path('profile/', user_views.profile, name="profile"),
