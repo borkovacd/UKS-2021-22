@@ -8,8 +8,7 @@ from django.views.generic import (
     ListView,
     DetailView
 )
-
-
+from django.contrib import messages
 from .models import Milestone, GENERAL_STATES, Project
 
 
@@ -48,12 +47,14 @@ def new_milestone(request, project_id):
             project=project
         )
         milestone.save()
+        messages.success(
+            request, f'The milestone "{milestone.title}" was added successfully!')
+        return redirect(reverse('project-detail', args=[project_id], ))
     else:
         project_id = request.path.split('/')[-1]
         template = loader.get_template('git/milestone-form.html')
         context = {'project_id': project_id}
         return HttpResponse(template.render(context, request))
-    return HttpResponseRedirect(reverse('milestones', kwargs={'project_id': project_id}))
 
 
 def delete_milestone(request, milestone_id, project_id):
@@ -81,6 +82,8 @@ def new_project(request):
             owner=request.user
         )
         project.save()
+        messages.success(
+            request, f'The project "{project.title}" was added successfully!')
     else:
         template = loader.get_template('vcs/new_project.html')
         context = {}
@@ -110,3 +113,10 @@ def projects(request):
 
 class ProjectDetailView(DetailView):
     model = Project
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['milestones'] = Milestone.objects.filter(
+            project_id=self.object)
+
+        return context
