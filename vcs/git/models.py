@@ -13,7 +13,7 @@ GENERAL_STATES = (
 
 class Project(models.Model):
     title = models.CharField(max_length=32)
-    description = models.CharField(max_length=100)
+    description = models.CharField(max_length=100, blank=True)
     git_repo = models.CharField(max_length=100)
     date_created = models.DateTimeField(default=timezone.now)
     # if the user us deleted, delete the project too

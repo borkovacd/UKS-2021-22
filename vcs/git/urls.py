@@ -1,17 +1,20 @@
 from django.urls import path
 from . import views
 from .views import (
+    ProjectCreateView,
     ProjectListView,
-    ProjectDetailView
+    ProjectDetailView,
+    ProjectUpdateView
 )
 
 urlpatterns = [
     path('', ProjectListView.as_view(), name='git-home'),
 
     path('projects/', views.projects, name='projects'),
-    path('project-form/', views.project_form, name='project-form'),
-    path('new-project/', views.new_project, name='new-project'),
+    path('new-project/', ProjectCreateView.as_view(), name='project-create'),
     path('project/<int:pk>/', ProjectDetailView.as_view(), name="project-detail"),
+    path('project/<int:pk>/update/',
+         ProjectUpdateView.as_view(), name='project-update'),
 
     path('milestones/<int:project_id>', views.milestones, name='milestones'),
     path('milestone-form/<int:project_id>',

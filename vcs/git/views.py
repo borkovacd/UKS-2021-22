@@ -5,10 +5,13 @@ from django.shortcuts import render, redirect
 from django.template import loader
 from django.urls import reverse
 from django.views.generic import (
+    CreateView,
     ListView,
-    DetailView
+    DetailView,
+    UpdateView
 )
 from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from .models import Milestone, GENERAL_STATES, Project
 
 
@@ -65,30 +68,43 @@ def delete_milestone(request, milestone_id, project_id):
 
 
 def project_form(request):
-    template = loader.get_template('git/project-form.html')
+    template = loader.get_template('git/project_form.html')
     project = ''
     context = {
         'project': project
     }
     return HttpResponse(template.render(context, request))
 
+# function based create project function
 
-def new_project(request):
-    if request.method == 'POST':
-        project = Project.objects.create(
-            title=request.POST['title'],
-            description=request.POST['description'],
-            git_repo=request.POST['git_repo'],
-            owner=request.user
-        )
-        project.save()
-        messages.success(
-            request, f'The project "{project.title}" was added successfully!')
-    else:
-        template = loader.get_template('vcs/new_project.html')
-        context = {}
-        return HttpResponse(template.render(context, request))
-    return HttpResponseRedirect(project.get_absolute_url())
+
+# def new_project(request):
+#     if request.method == 'POST':
+#         project = Project.objects.create(
+#             title=request.POST['title'],
+#             description=request.POST['description'],
+#             git_repo=request.POST['git_repo'],
+#             owner=request.user
+#         )
+#         project.save()
+#         messages.success(
+#             request, f'The project "{project.title}" was added successfully!')
+#     else:
+#         template = loader.get_template('vcs/new_project.html')
+#         context = {}
+#         return HttpResponse(template.render(context, request))
+#     return HttpResponseRedirect(project.get_absolute_url())
+
+# class based create project function
+
+
+class ProjectCreateView(LoginRequiredMixin, CreateView):
+    model = Project
+    fields = ['title', 'description', 'git_repo']
+
+    def form_valid(self, form):
+        form.instance.owner = self.request.user
+        return super().form_valid(form)
 
 # class based PROJECTS view
 
@@ -120,3 +136,18 @@ class ProjectDetailView(DetailView):
             project_id=self.object)
 
         return context
+
+
+class ProjectUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = Project
+    fields = ['title', 'description', 'git_repo']
+
+    def form_valid(self, form):
+        form.instance.owner = self.request.user
+        return super().form_valid(form)
+
+    def test_func(self):
+        project = self.get_object()
+        if self.request.user == project.owner:
+            return True
+        return False
