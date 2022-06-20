@@ -8,7 +8,8 @@ from django.views.generic import (
     CreateView,
     ListView,
     DetailView,
-    UpdateView
+    UpdateView,
+    DeleteView
 )
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
@@ -145,6 +146,17 @@ class ProjectUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     def form_valid(self, form):
         form.instance.owner = self.request.user
         return super().form_valid(form)
+
+    def test_func(self):
+        project = self.get_object()
+        if self.request.user == project.owner:
+            return True
+        return False
+
+
+class ProjectDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    model = Project
+    success_url = '/'
 
     def test_func(self):
         project = self.get_object()
