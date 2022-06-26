@@ -13,7 +13,9 @@ from django.views.generic import (
 )
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.contrib.auth.decorators import login_required, user_passes_test
 from .models import Milestone, GENERAL_STATES, Project
+from .forms import CollaboratorsForm
 
 
 def home(request):
@@ -163,3 +165,33 @@ class ProjectDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         if self.request.user == project.owner:
             return True
         return False
+
+### COLLABORATORS ###
+
+
+def collaborators(request, project_id):
+    projects = Project.objects.all().filter(project=project_id)
+    template = loader.get_template('git/collaborators.html')
+    context = {
+        'projects': projects,
+        'project_id': project_id
+    }
+    return HttpResponse(template.render(context, request))
+
+
+@login_required
+def add_collaborator(request, project_id):
+    project = Project.objects.get(id=project_id)
+    exisitingCollaborators = project.collaborators.all()
+    form = CollaboratorsForm(
+        request.user.id, exisitingCollaborators, request.POST)
+    if request.method == 'POST':
+        collaborators = [*exisitingCollaborators,
+                         *request.POST['collaborators']]
+        project.collaborators.set(collaborators)
+        project.save()
+        messages.success(
+            request, f'The collaborators ware saved successfully!')
+    else:
+        return render(request, 'git/collaborator_form.html', {'form': form})
+    return HttpResponseRedirect(project.get_absolute_url())

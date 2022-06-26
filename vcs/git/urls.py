@@ -19,6 +19,11 @@ urlpatterns = [
     path('project/<int:pk>/delete/',
          ProjectDeleteView.as_view(), name='project-delete'),
 
+
+    path('new-collaborator/<int:project_id>/',
+         views.add_collaborator, name='new-collaborator'),
+
+
     path('milestones/<int:project_id>', views.milestones, name='milestones'),
     path('milestone-form/<int:project_id>',
          views.milestone_form, name='milestone-form'),
