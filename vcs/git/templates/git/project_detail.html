@@ -82,6 +82,7 @@
       <div class="media-body">
         <h3 class="article-title">{{ collaborator.username }}</h3>
         <p class="article-content"><i>Collaborator</i></p>
+        <a class="btn btn-danger btn-sm mt-1 mb-1" href="{% url 'collaborator-delete' project.id collaborator.id %}">Delete</a>
       </div>
     </article>
     {% empty %}

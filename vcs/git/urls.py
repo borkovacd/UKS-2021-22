@@ -22,6 +22,8 @@ urlpatterns = [
 
     path('new-collaborator/<int:project_id>/',
          views.add_collaborator, name='new-collaborator'),
+    path('project/<int:project_id>/collaborators/<int:collaborator_id>/delete/',
+         views.delete_collaborator, name='collaborator-delete'),
 
 
     path('milestones/<int:project_id>', views.milestones, name='milestones'),

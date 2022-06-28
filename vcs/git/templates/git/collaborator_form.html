@@ -6,16 +6,16 @@
         {% csrf_token %}
         <fieldset class="form-group">
             <legend class="border-bottom mb-4">Add a collaborator</legend>
-            {% comment %} {% if %} {% endcomment %}
-                <h4><i> Currently, there's no possible user to collaboratorate with</i></h4>
-            {% comment %} {% elseif  %} {% endcomment %}
+            {% if form.IsCollaborationPossible is False %} 
+            <h4>Currently, there's no possible user to collaboratorate with. <i class="fa-regular fa-face-frown"></i></h4>
+            {% else  %}
                 {{ form|crispy }}
                 <div class="form-group">
                     <button class="btn btn-outline-info" type="submit">Add</button>
                 </div>
-            {% comment %} {% endif %} {% endcomment %}
-        </fieldset>
-       
+            {% endif %}
+        </fieldset>  
     </form>
+    <a class="btn btn-secondary" href="{% url 'project-detail' project.id %}">Cancel</a>
 </div>
 {% endblock content %}

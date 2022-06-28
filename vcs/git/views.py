@@ -16,6 +16,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.decorators import login_required, user_passes_test
 from .models import Milestone, GENERAL_STATES, Project
 from .forms import CollaboratorsForm
+from django.contrib.auth.models import User
 
 
 def home(request):
@@ -187,11 +188,38 @@ def add_collaborator(request, project_id):
         request.user.id, exisitingCollaborators, request.POST)
     if request.method == 'POST':
         collaborators = [*exisitingCollaborators,
-                         *request.POST['collaborators']]
+                         *request.POST.getlist('collaborators')]
         project.collaborators.set(collaborators)
         project.save()
         messages.success(
             request, f'The collaborators ware saved successfully!')
     else:
-        return render(request, 'git/collaborator_form.html', {'form': form})
+        return render(
+            request,
+            'git/collaborator_form.html',
+            {
+                'form': form,
+                'project': project
+            })
     return HttpResponseRedirect(project.get_absolute_url())
+
+
+@login_required
+def delete_collaborator(request, project_id, collaborator_id):
+    collaborator = User.objects.get(id=collaborator_id)
+    project = Project.objects.get(id=project_id)
+    if request.method == 'POST':
+        project.collaborators.remove(collaborator_id)
+        project.save()
+        messages.success(
+            request, f'The collaborator {collaborator.username} was removed successfully!')
+        return redirect(reverse('project-detail', args=[project_id]))
+    else:
+        return render(
+            request,
+            'git/collaborator_confirm_delete.html',
+            {
+                'collaborator': collaborator,
+                'project': project
+            }
+        )
