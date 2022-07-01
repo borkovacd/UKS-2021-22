@@ -1,6 +1,7 @@
 from django.urls import path
 from . import views
 from .views import (
+    LabelCreateView,
     ProjectCreateView,
     ProjectListView,
     ProjectDetailView,
@@ -19,12 +20,10 @@ urlpatterns = [
     path('project/<int:pk>/delete/',
          ProjectDeleteView.as_view(), name='project-delete'),
 
-
     path('new-collaborator/<int:project_id>/',
          views.add_collaborator, name='new-collaborator'),
     path('project/<int:project_id>/collaborators/<int:collaborator_id>/delete/',
          views.delete_collaborator, name='collaborator-delete'),
-
 
     path('milestones/<int:project_id>', views.milestones, name='milestones'),
     path('milestone-form/<int:project_id>',
@@ -32,5 +31,9 @@ urlpatterns = [
     path('new-milestone/<int:project_id>',
          views.new_milestone, name='new-milestone'),
     path('delete-milestone/<int:milestone_id>/<int:project_id>',
-         views.delete_milestone, name='delete-milestone')
+         views.delete_milestone, name='delete-milestone'),
+
+    path('project/<int:project_id>/new-label/',
+         LabelCreateView.as_view(), name='label-create'),
+
 ]

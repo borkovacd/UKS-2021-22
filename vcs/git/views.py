@@ -1,5 +1,6 @@
 from msilib.schema import ListView
 from pydoc import describe
+from pyexpat import model
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.template import loader
@@ -14,7 +15,7 @@ from django.views.generic import (
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.decorators import login_required, user_passes_test
-from .models import Milestone, GENERAL_STATES, Project
+from .models import Milestone, GENERAL_STATES, Project, Label
 from .forms import CollaboratorsForm
 from django.contrib.auth.models import User
 
@@ -79,6 +80,7 @@ def project_form(request):
     }
     return HttpResponse(template.render(context, request))
 
+
 # function based create project function
 
 
@@ -110,6 +112,7 @@ class ProjectCreateView(LoginRequiredMixin, CreateView):
         form.instance.owner = self.request.user
         return super().form_valid(form)
 
+
 # class based PROJECTS view
 
 
@@ -118,6 +121,7 @@ class ProjectListView(ListView):
     template_name = 'git/home.html'  # <app>/<model>_<viewtype>.html
     # by default it expects this: git/project_list.html
     context_object_name = 'projects'
+
 
 # function based PROJECTS view
 
@@ -137,6 +141,8 @@ class ProjectDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['milestones'] = Milestone.objects.filter(
+            project_id=self.object)
+        context['labels'] = Label.objects.filter(
             project_id=self.object)
 
         return context
@@ -166,6 +172,7 @@ class ProjectDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         if self.request.user == project.owner:
             return True
         return False
+
 
 ### COLLABORATORS ###
 
@@ -223,3 +230,18 @@ def delete_collaborator(request, project_id, collaborator_id):
                 'project': project
             }
         )
+
+# LABELS
+
+
+class LabelCreateView(LoginRequiredMixin, CreateView):
+    model = Label
+    fields = ['title', 'color', 'description']
+
+    def form_valid(self, form):
+        form.instance.project = Project.objects.get(
+            id=self.kwargs['project_id'])
+        label_title = form.cleaned_data['title']
+        messages.success(
+            self.request, f'The label "{label_title}" was created successfully!')
+        return super().form_valid(form)

@@ -39,7 +39,9 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'django.contrib.staticfiles'
+    'django.contrib.staticfiles',
+    'colorfield',
+    'colorful'
 ]
 
 MIDDLEWARE = [
@@ -122,8 +124,10 @@ STATIC_URL = '/static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-MEDIA_ROOT = BASE_DIR / 'media' #full path to a directory  where would like django to save the media files
-MEDIA_URL = '/media/' #how to access image in browser /media/profile_pics/default.jpg for example
+# full path to a directory  where would like django to save the media files
+MEDIA_ROOT = BASE_DIR / 'media'
+# how to access image in browser /media/profile_pics/default.jpg for example
+MEDIA_URL = '/media/'
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 

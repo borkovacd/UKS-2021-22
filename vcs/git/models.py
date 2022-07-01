@@ -2,6 +2,8 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.urls import reverse
 from django.utils import timezone
+from colorfield.fields import ColorField
+from colorful.fields import RGBColorField
 
 # Create your models here.
 GENERAL_STATES = (
@@ -41,3 +43,13 @@ class Milestone(models.Model):
 
     def __str__(self):
         return str(self.title)
+
+
+class Label(models.Model):
+    title = models.CharField(max_length=50)
+    color = RGBColorField()
+    description = models.CharField(max_length=100, blank=True)
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+
+    def get_absolute_url(self):
+        return reverse("project-detail", kwargs={"pk": self.project.pk})
