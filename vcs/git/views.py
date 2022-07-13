@@ -16,7 +16,10 @@ from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.decorators import login_required, user_passes_test
 from .models import Milestone, GENERAL_STATES, Project, Label
-from .forms import CollaboratorsForm
+from .forms import (
+    CollaboratorsForm,
+    LabelForm
+)
 from django.contrib.auth.models import User
 
 
@@ -57,7 +60,7 @@ def new_milestone(request, project_id):
         milestone.save()
         messages.success(
             request, f'The milestone "{milestone.title}" was added successfully!')
-        return redirect(reverse('project-detail', args=[project_id], ))
+        return redirect(reverse('project-detail', args=[project_id]))
     else:
         project_id = request.path.split('/')[-1]
         template = loader.get_template('git/milestone-form.html')
@@ -219,7 +222,7 @@ def delete_collaborator(request, project_id, collaborator_id):
         project.collaborators.remove(collaborator_id)
         project.save()
         messages.success(
-            request, f'The collaborator {collaborator.username} was removed successfully!')
+            request, f'The collaborator "{collaborator.username}" was removed successfully!')
         return redirect(reverse('project-detail', args=[project_id]))
     else:
         return render(
@@ -244,4 +247,25 @@ class LabelCreateView(LoginRequiredMixin, CreateView):
         label_title = form.cleaned_data['title']
         messages.success(
             self.request, f'The label "{label_title}" was created successfully!')
+        return super().form_valid(form)
+
+
+class LabelDeleteView(LoginRequiredMixin, DeleteView):
+    model = Label
+
+    def get_success_url(self):
+        project = self.object.project
+        messages.success(
+            self.request, f'The label "{self.object.title}" was removed successfully!')
+        return reverse('project-detail', args=[project.id])
+
+
+class LabelUpdateView(LoginRequiredMixin, UpdateView):
+    model = Label
+    form_class = LabelForm
+
+    def form_valid(self, form):
+        label_title = form.cleaned_data['title']
+        messages.success(
+            self.request, f'The label "{label_title}" was updated successfully!')
         return super().form_valid(form)

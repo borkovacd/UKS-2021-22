@@ -1,6 +1,7 @@
 from django import forms
 from .models import (
-    Project
+    Project,
+    Label
 )
 from django.contrib.auth.models import User
 from django.db.models import Q
@@ -25,3 +26,9 @@ class CollaboratorsForm(forms.ModelForm):
     def __setIsCollaborationPossibleFlag(self):
         if not self.fields['collaborators'].queryset:
             self.IsCollaborationPossible = False
+
+
+class LabelForm(forms.ModelForm):
+    class Meta:
+        model = Label
+        fields = ['title', 'color', 'description']

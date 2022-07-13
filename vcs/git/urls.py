@@ -1,7 +1,11 @@
 from django.urls import path
+
+from git.models import Label
 from . import views
 from .views import (
     LabelCreateView,
+    LabelUpdateView,
+    LabelDeleteView,
     ProjectCreateView,
     ProjectListView,
     ProjectDetailView,
@@ -35,5 +39,7 @@ urlpatterns = [
 
     path('project/<int:project_id>/new-label/',
          LabelCreateView.as_view(), name='label-create'),
+    path('label/<int:pk>/update/', LabelUpdateView.as_view(), name='label-update'),
+    path('label/<int:pk>/delete/', LabelDeleteView.as_view(), name='label-delete')
 
 ]
