@@ -1,6 +1,7 @@
 from msilib.schema import ListView
 from pydoc import describe
 from pyexpat import model
+from urllib import request
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.template import loader
@@ -14,13 +15,16 @@ from django.views.generic import (
 )
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.decorators import login_required
 from .models import Milestone, GENERAL_STATES, Project, Label
 from .forms import (
     CollaboratorsForm,
+    IssueForm,
     LabelForm
 )
 from django.contrib.auth.models import User
+from django.db.models import Q
+from .utils import request_passes_test
 
 
 def home(request):
@@ -269,3 +273,39 @@ class LabelUpdateView(LoginRequiredMixin, UpdateView):
         messages.success(
             self.request, f'The label "{label_title}" was updated successfully!')
         return super().form_valid(form)
+
+
+# ISSUES
+
+@request_passes_test
+def test_ownership(request, **kwargs):
+    project = Project.objects.get(id=kwargs['project_id'])
+    if request.user == project.owner:
+        return True
+    return False
+
+
+@login_required
+@test_ownership
+def add_issue(request, project_id):
+    form = IssueForm(request.POST)
+    form.fields['milestone'].queryset = Milestone.objects.filter(
+        project_id=project_id)
+    form.fields['labels'].queryset = Label.objects.filter(
+        project_id=project_id)
+    form.fields['assignees'].queryset = User.objects.filter(is_superuser=False).filter(
+        ~Q(id=request.user.id))
+    if request.method == 'POST':
+        if form.is_valid():
+            new_issue = form.instance
+            new_issue.author_id = request.user.id
+            new_issue.project_id = project_id
+            new_issue.save()
+            new_issue.labels.set(form.cleaned_data['labels'])
+            new_issue.assignees.set(form.cleaned_data['assignees'])
+            new_issue.save()
+            issue_title = form.cleaned_data['title']
+            messages.success(
+                request, f'The issue "{issue_title}" was created successfully!')
+            return redirect(reverse('project-detail', args=[project_id]))
+    return render(request, 'git/issue_form.html', {'form': form})

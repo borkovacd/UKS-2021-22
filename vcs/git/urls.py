@@ -40,6 +40,9 @@ urlpatterns = [
     path('project/<int:project_id>/new-label/',
          LabelCreateView.as_view(), name='label-create'),
     path('label/<int:pk>/update/', LabelUpdateView.as_view(), name='label-update'),
-    path('label/<int:pk>/delete/', LabelDeleteView.as_view(), name='label-delete')
+    path('label/<int:pk>/delete/', LabelDeleteView.as_view(), name='label-delete'),
+
+    path('project/<int:project_id>/new-issue/',
+         views.add_issue, name='issue-create'),
 
 ]

@@ -1,5 +1,6 @@
 from django import forms
 from .models import (
+    Issue,
     Project,
     Label
 )
@@ -32,3 +33,9 @@ class LabelForm(forms.ModelForm):
     class Meta:
         model = Label
         fields = ['title', 'color', 'description']
+
+
+class IssueForm(forms.ModelForm):
+    class Meta:
+        model = Issue
+        fields = ['title', 'description', 'milestone', 'labels', 'assignees']
