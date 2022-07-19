@@ -70,6 +70,7 @@ class Issue(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     date_created = models.DateTimeField(default=timezone.now)
+    date_closed = models.DateTimeField(null=True)
     is_open = models.BooleanField(default=True)
     milestone = models.ForeignKey(
         Milestone, on_delete=models.CASCADE, blank=True)
@@ -82,3 +83,17 @@ class Issue(models.Model):
 
     def get_absolute_url(self):
         return reverse("project-detail", kwargs={"pk": self.project.pk})
+
+
+class Comment(models.Model):
+    text = models.CharField(max_length=100)
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    issue = models.ForeignKey(Issue, on_delete=models.CASCADE)
+    date_created = models.DateTimeField(default=timezone.now)
+    date_edited = models.DateTimeField(null=True)
+
+    def __str__(self):
+        return str(self.text)
+
+    def get_absolute_url(self):
+        return reverse("issue-detail", kwargs={"pk": self.issue.pk})

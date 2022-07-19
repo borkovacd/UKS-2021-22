@@ -3,6 +3,9 @@ from django.urls import path
 from git.models import Label
 from . import views
 from .views import (
+    CommentDeleteView,
+    CommentUpdateView,
+    IssueDetailView,
     LabelCreateView,
     LabelUpdateView,
     LabelDeleteView,
@@ -44,5 +47,14 @@ urlpatterns = [
 
     path('project/<int:project_id>/new-issue/',
          views.add_issue, name='issue-create'),
+    path('issues/<int:pk>/', IssueDetailView.as_view(), name='issue-detail'),
+
+    path('comment/<int:pk>/delete/',
+         CommentDeleteView.as_view(), name='comment-delete'),
+    path('comment/<int:pk>/update/',
+         CommentUpdateView.as_view(), name='comment-update'),
+
+
+
 
 ]

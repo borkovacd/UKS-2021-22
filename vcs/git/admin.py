@@ -3,10 +3,12 @@ from .models import (
     Project,
     Issue,
     Milestone,
-    Label
+    Label,
+    Comment
 )
 
 admin.site.register(Project)
 admin.site.register(Issue)
 admin.site.register(Milestone)
 admin.site.register(Label)
+admin.site.register(Comment)

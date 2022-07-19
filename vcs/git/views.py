@@ -1,7 +1,4 @@
 from msilib.schema import ListView
-from pydoc import describe
-from pyexpat import model
-from urllib import request
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.template import loader
@@ -16,15 +13,25 @@ from django.views.generic import (
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.decorators import login_required
-from .models import Milestone, GENERAL_STATES, Project, Label
+from django.utils import timezone
+from .models import (
+    GENERAL_STATES,
+    Project,
+    Issue,
+    Milestone,
+    Label,
+    Comment
+)
 from .forms import (
     CollaboratorsForm,
     IssueForm,
-    LabelForm
+    LabelForm,
+    CommentForm
 )
 from django.contrib.auth.models import User
 from django.db.models import Q
 from .utils import request_passes_test
+from django.views.generic.edit import FormMixin
 
 
 def home(request):
@@ -150,6 +157,8 @@ class ProjectDetailView(DetailView):
         context['milestones'] = Milestone.objects.filter(
             project_id=self.object)
         context['labels'] = Label.objects.filter(
+            project_id=self.object)
+        context['issues'] = Issue.objects.filter(
             project_id=self.object)
 
         return context
@@ -309,3 +318,53 @@ def add_issue(request, project_id):
                 request, f'The issue "{issue_title}" was created successfully!')
             return redirect(reverse('project-detail', args=[project_id]))
     return render(request, 'git/issue_form.html', {'form': form})
+
+
+class IssueDetailView(FormMixin, DetailView):
+    model = Issue
+    context_object_name = 'comment'
+    form_class = CommentForm
+
+    def get_success_url(self):
+        return reverse('issue-detail', kwargs={'pk': self.object.pk})
+
+    def get_context_data(self, **kwargs):
+        context = super(FormMixin, self).get_context_data(**kwargs)
+        comments = Comment.objects.filter(issue_id=self.object.pk)
+        context['form'] = self.get_form()
+        context['comments'] = comments
+        return context
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        form = self.get_form()
+        new_comment = form.instance
+        new_comment.author_id = request.user.id
+        new_comment.issue_id = self.object.pk
+        new_comment.text = form['text'].value()
+        new_comment.save()
+        return super(IssueDetailView, self).form_valid(form)
+
+
+class CommentDeleteView(LoginRequiredMixin, DeleteView):
+    model = Comment
+
+    def get_success_url(self):
+        issue = self.object.issue
+        messages.success(
+            self.request, f'The comment "{self.object.text}" was removed successfully!')
+        return reverse('issue-detail', args=[issue.id])
+
+
+class CommentUpdateView(LoginRequiredMixin, UpdateView):
+    model = Comment
+    form_class = CommentForm
+
+    def form_valid(self, form):
+        comment_text = form.cleaned_data['text']
+        updated_comment = form.instance
+        updated_comment.date_edited = timezone.now()
+        updated_comment.save()
+        messages.success(
+            self.request, f'The comment "{comment_text}" was updated successfully!')
+        return super().form_valid(form)
