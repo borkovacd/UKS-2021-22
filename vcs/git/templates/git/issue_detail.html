@@ -5,7 +5,7 @@
   <div class="media-body">
     <div class="row" style="display: flex; justify-content: space-between">
       <h2 class="article-title ml-3">
-        {% if issue.is_open  %}
+        {% if object.is_open  %}
           <i class="fa fa-solid fa-circle-dot" style="color: green;"></i>
         {% else %}
           <i class="fa fa-solid fa-circle-dot" style="color: red;"></i>
@@ -26,12 +26,12 @@
       </div>
     </div>
     <h6 class="text-muted">
-      {{issue.description}}
+      {{object.description}}
     </h6>
     <p class="text-muted">
-      #{{issue.id}} opened <i>{{issue.date_created|date:"F d, Y"}}</i> by <i>{{issue.author}}</i>
-      {% if issue.is_open == False %}
-        #{{issue.id}} was closed on <i>{{issue.date_closed|date:"F d, Y"}}</i>
+      #{{object.id}} opened <i>{{object.date_created|date:"F d, Y"}}</i> by <i>{{object.author}}</i>
+      {% if object.is_open == False %}
+        #{{object.id}} was closed on <i>{{object.date_closed|date:"F d, Y"}}</i>
       {% endif %}
     </p> 
     <hr/>
@@ -42,11 +42,17 @@
       &nbsp;&nbsp;&nbsp;
       <strong>Milestone</strong>
     </a>
+    
     <p>
-      <span class="badge badge-warning mt-2" style="font-size: larger">
-        {{object.milestone.title}}
-    </span>
+      {% if object.milestone is not None %}
+        <span class="badge badge-warning mt-2" style="font-size: larger">
+          {{object.milestone.title}}
+        </span>
+      {% else %}
+        <span class="ml-3"><i>No milestone</i></span>
+      {% endif %}
     </p>
+    
     
   </div>
   <hr/>
@@ -61,7 +67,7 @@
     </a>
     <div>
     {% for label in object.labels.all %}
-      <span class="badge mt-2" style="background-color: {{label.color}} !important; color: white; font-size: larger">
+      <span class="badge mt-2 ml-3" style="background-color: {{label.color}} !important; color: white; font-size: larger">
         {{label.title}}
     </span>
     {% endfor %}
@@ -79,7 +85,7 @@
     </a>
     <div>
     {% for user in object.assignees.all %}
-      <span class="badge badge-warning mt-2" style="font-size: larger">
+      <span class="badge badge-warning mt-2 ml-3" style="font-size: larger">
         {{user.username}}
     </span>
     {% endfor %}
