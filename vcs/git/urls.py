@@ -6,6 +6,7 @@ from .views import (
     CommentDeleteView,
     CommentUpdateView,
     IssueDetailView,
+    IssueDeleteView,
     LabelCreateView,
     LabelUpdateView,
     LabelDeleteView,
@@ -48,6 +49,8 @@ urlpatterns = [
     path('project/<int:project_id>/new-issue/',
          views.add_issue, name='issue-create'),
     path('issues/<int:pk>/', IssueDetailView.as_view(), name='issue-detail'),
+    path('issues/<int:pk>/delete/',
+         IssueDeleteView.as_view(), name='issue-delete'),
 
     path('comment/<int:pk>/delete/',
          CommentDeleteView.as_view(), name='comment-delete'),

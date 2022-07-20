@@ -1,0 +1,16 @@
+{% extends 'git/base.html' %}
+{% block content %}
+    <div class="content-section">
+        <form method="POST">
+            {% csrf_token %}
+            <fieldset class="form-group">
+                <legend class="border-bottom mb-4">Delete Issue</legend>
+                <h3>Are you sure you want to delete the issue "{{ object.title }}"</h3>
+            </fieldset>
+            <div class="form-group">
+                <button class="btn btn-danger" type="submit">Yes, Delete</button>
+                <a class="btn btn-secondary" href="{% url 'project-detail' object.project.id %}">Cancel</a>
+            </div>
+        </form>
+    </div>
+{% endblock content %}

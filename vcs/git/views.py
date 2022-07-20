@@ -346,6 +346,22 @@ class IssueDetailView(FormMixin, DetailView):
         return super(IssueDetailView, self).form_valid(form)
 
 
+class IssueDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    model = Issue
+
+    def get_success_url(self):
+        project = self.object.project
+        messages.success(
+            self.request, f'The issue "{self.object.title}" was removed successfully!')
+        return reverse('project-detail', args=[project.id])
+
+    def test_func(self):
+        issue = self.get_object()
+        if self.request.user == issue.author:
+            return True
+        return False
+
+
 class CommentDeleteView(LoginRequiredMixin, DeleteView):
     model = Comment
 

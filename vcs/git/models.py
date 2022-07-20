@@ -73,7 +73,7 @@ class Issue(models.Model):
     date_closed = models.DateTimeField(null=True)
     is_open = models.BooleanField(default=True)
     milestone = models.ForeignKey(
-        Milestone, on_delete=models.CASCADE, blank=True)
+        Milestone, on_delete=models.CASCADE, blank=True, null=True)
     labels = models.ManyToManyField(Label, blank=True)
     assignees = models.ManyToManyField(
         User, related_name='assignees', blank=True)
