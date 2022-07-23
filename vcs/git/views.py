@@ -1,3 +1,4 @@
+from cProfile import label
 from msilib.schema import ListView
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect, get_object_or_404
@@ -383,8 +384,8 @@ class CommentUpdateView(LoginRequiredMixin, UpdateView):
 @test_issue_permissions
 def set_milestone_view(request, issue_id):
     issue = get_object_or_404(Issue, pk=issue_id)
-    issue_milestones = Milestone.objects.filter(project=issue.project_id)
-    return render(request, 'git/set_milestone.html', {'issue': issue, 'milestones': issue_milestones})
+    project_milestones = Milestone.objects.filter(project=issue.project_id)
+    return render(request, 'git/set_milestone.html', {'issue': issue, 'milestones': project_milestones})
 
 
 @login_required
@@ -402,5 +403,36 @@ def set_milestone(request, issue_id, milestone_id):
 def clear_milestone(request, issue_id, milestone_id):
     issue = get_object_or_404(Issue, pk=issue_id)
     issue.milestone = None
+    issue.save()
+    return redirect(reverse('issue-detail', args=[issue_id]))
+
+
+@login_required
+@test_issue_permissions
+def set_label_view(request, issue_id):
+    issue = get_object_or_404(Issue, pk=issue_id)
+    project_labels = Label.objects.filter(
+        project=issue.project_id)
+    applied_labels = issue.labels.all()
+    applicable_labels = project_labels.exclude(
+        id__in=[l.id for l in applied_labels])
+    return render(request, 'git/apply_label.html', {'issue': issue, 'applicable_labels': applicable_labels})
+
+
+@login_required
+@test_issue_permissions
+def apply_label(request, issue_id, label_id):
+    issue = get_object_or_404(Issue, pk=issue_id)
+    label = get_object_or_404(Label, pk=label_id)
+    issue.labels.add(label)
+    issue.save()
+    return redirect(reverse('issue-detail', args=[issue_id]))
+
+
+@login_required
+@test_issue_permissions
+def remove_label(request, issue_id, label_id):
+    issue = get_object_or_404(Issue, pk=issue_id)
+    issue.labels.set(issue.labels.exclude(id=label_id))
     issue.save()
     return redirect(reverse('issue-detail', args=[issue_id]))

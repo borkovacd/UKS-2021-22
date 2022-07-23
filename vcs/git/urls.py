@@ -57,6 +57,12 @@ urlpatterns = [
          views.set_milestone, name='set-milestone'),
     path('issues/<int:issue_id>/set-milestone/<int:milestone_id>/clear/',
          views.clear_milestone, name='clear-milestone'),
+    path('issues/<int:issue_id>/set-label/',
+         views.set_label_view, name='set-label-view'),
+    path('issues/<int:issue_id>/set-label/<int:label_id>/apply/',
+         views.apply_label, name='apply-label'),
+    path('issues/<int:issue_id>/set-label/<int:label_id>/remove/',
+         views.remove_label, name='remove-label'),
 
 
     path('comment/<int:pk>/delete/',
