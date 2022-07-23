@@ -36,13 +36,12 @@
     </p> 
     <hr/>
     <div>
-    {% comment %} <a href="set_milestone/"> {% endcomment %}
-    <a>
-      <span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
-      &nbsp;&nbsp;&nbsp;
-      <strong>Milestone</strong>
-    </a>
     
+      <a class="ml-3" href="set-milestone/">
+        <strong>Milestone</strong>
+        <i class="ml-1 fa-solid fa-gear"></i>
+      </a>  
+
     <p>
       {% if object.milestone is not None %}
         <span class="badge badge-warning mt-2" style="font-size: larger">

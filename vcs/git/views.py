@@ -1,6 +1,6 @@
 from msilib.schema import ListView
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.template import loader
 from django.urls import reverse
 from django.views.generic import (
@@ -30,7 +30,7 @@ from .forms import (
 )
 from django.contrib.auth.models import User
 from django.db.models import Q
-from .utils import request_passes_test
+from .test_functions import test_ownership, test_issue_permissions
 from django.views.generic.edit import FormMixin
 
 
@@ -286,13 +286,6 @@ class LabelUpdateView(LoginRequiredMixin, UpdateView):
 
 # ISSUES
 
-@request_passes_test
-def test_ownership(request, **kwargs):
-    project = Project.objects.get(id=kwargs['project_id'])
-    if request.user == project.owner:
-        return True
-    return False
-
 
 @login_required
 @test_ownership
@@ -384,3 +377,30 @@ class CommentUpdateView(LoginRequiredMixin, UpdateView):
         messages.success(
             self.request, f'The comment "{comment_text}" was updated successfully!')
         return super().form_valid(form)
+
+
+@login_required
+@test_issue_permissions
+def set_milestone_view(request, issue_id):
+    issue = get_object_or_404(Issue, pk=issue_id)
+    issue_milestones = Milestone.objects.filter(project=issue.project_id)
+    return render(request, 'git/set_milestone.html', {'issue': issue, 'milestones': issue_milestones})
+
+
+@login_required
+@test_issue_permissions
+def set_milestone(request, issue_id, milestone_id):
+    issue = get_object_or_404(Issue, pk=issue_id)
+    milestone = get_object_or_404(Milestone, pk=milestone_id)
+    issue.milestone = milestone
+    issue.save()
+    return redirect(reverse('issue-detail', args=[issue_id]))
+
+
+@login_required
+@test_issue_permissions
+def clear_milestone(request, issue_id, milestone_id):
+    issue = get_object_or_404(Issue, pk=issue_id)
+    issue.milestone = None
+    issue.save()
+    return redirect(reverse('issue-detail', args=[issue_id]))

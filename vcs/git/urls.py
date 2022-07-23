@@ -51,6 +51,13 @@ urlpatterns = [
     path('issues/<int:pk>/', IssueDetailView.as_view(), name='issue-detail'),
     path('issues/<int:pk>/delete/',
          IssueDeleteView.as_view(), name='issue-delete'),
+    path('issues/<int:issue_id>/set-milestone/',
+         views.set_milestone_view, name='set-milestone-view'),
+    path('issues/<int:issue_id>/set-milestone/<int:milestone_id>/set/',
+         views.set_milestone, name='set-milestone'),
+    path('issues/<int:issue_id>/set-milestone/<int:milestone_id>/clear/',
+         views.clear_milestone, name='clear-milestone'),
+
 
     path('comment/<int:pk>/delete/',
          CommentDeleteView.as_view(), name='comment-delete'),
