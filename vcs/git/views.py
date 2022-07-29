@@ -436,3 +436,36 @@ def remove_label(request, issue_id, label_id):
     issue.labels.set(issue.labels.exclude(id=label_id))
     issue.save()
     return redirect(reverse('issue-detail', args=[issue_id]))
+
+
+@login_required
+@test_issue_permissions
+def set_assignees_view(request, issue_id):
+    issue = get_object_or_404(Issue, pk=issue_id)
+    project = Project.objects.filter(
+        id=issue.project_id)
+    project_collaborators = [* issue.project.collaborators.all(),
+                             issue.author]
+    existing_assignees = issue.assignees.all()
+    available_assignees = [
+        collaborator for collaborator in project_collaborators if collaborator not in existing_assignees]
+    return render(request, 'git/assign_issue.html', {'issue': issue, 'available_assignees': available_assignees})
+
+
+@login_required
+@test_issue_permissions
+def add_assignee(request, issue_id, assignee_id):
+    issue = get_object_or_404(Issue, pk=issue_id)
+    assignee = get_object_or_404(User, pk=assignee_id)
+    issue.assignees.add(assignee)
+    issue.save()
+    return redirect(reverse('issue-detail', args=[issue_id]))
+
+
+@login_required
+@test_issue_permissions
+def remove_assignee(request, issue_id, assignee_id):
+    issue = get_object_or_404(Issue, pk=issue_id)
+    issue.assignees.set(issue.assignees.exclude(id=assignee_id))
+    issue.save()
+    return redirect(reverse('issue-detail', args=[issue_id]))

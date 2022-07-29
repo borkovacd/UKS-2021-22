@@ -44,7 +44,7 @@
 
     <p>
       {% if object.milestone is not None %}
-        <span class="badge badge-warning mt-2" style="font-size: larger">
+        <span class="badge badge-warning mt-2 ml-3" style="font-size: larger">
           {{object.milestone.title}}
         </span>
       {% else %}
@@ -63,29 +63,35 @@
       <i class="ml-1 fa-solid fa-gear"></i>
     </a>
     <div>
+    {% if not object.labels.all %}
+      <span class="ml-3"><i>No labels</i></span>
+    {% else %}
     {% for label in object.labels.all %}
       <span class="badge mt-2 ml-3" style="background-color: {{label.color}} !important; color: white; font-size: larger">
         {{label.title}}
     </span>
     {% endfor %}
+    {% endif %}
     <div></div>
   </div>
   <hr/>
 
   <hr/>
   <div>
-    {% comment %} <a href="assign_user/"> {% endcomment %}
-      <a>
-      <span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
-      &nbsp;&nbsp;&nbsp;
+    <a class="ml-3" href="set-assignees/">
       <strong>Assignees</strong>
+      <i class="ml-1 fa-solid fa-gear"></i>
     </a>
     <div>
+    {% if not object.assignees.all %}
+      <span class="ml-3"><i>No assignees</i></span>
+    {% else %}
     {% for user in object.assignees.all %}
       <span class="badge badge-warning mt-2 ml-3" style="font-size: larger">
         {{user.username}}
     </span>
     {% endfor %}
+    {% endif %}
     <div></div>
   </div>
   </div> 
@@ -97,30 +103,30 @@
 </article>
 <article>
      <div class="content-section">
-      {% for comment in comments %}
       <fieldset class=form-group>
         <legend class="border-bottom mb-4"><h4>Comments</h4></legend>
-      <article class="media content-section">
-        <img class="rounded-circle article-img" src="{{ comment.author.profile.image.url }}"/>
-        <div class="media-body">
-          <h6 class="text-muted">
-            {% if comment.date_edited %}
-            <i>{{comment.author.username}}</i> commented on <i>{{comment.date_created|date:"F d, Y"}}</i> 
-            <br/><h7 class="small text-muted">edited on <i>{{comment.date_edited|date:"F d, Y"}}</i></h7>
-            {% else %}
-            <i>{{comment.author.username}}</i> commented on <i>{{comment.date_created|date:"F d, Y"}}</i>
-            {% endif %}
-          </h6>
-          <h5><a class="article-title">{{ comment.text }}</a></h5>
-          <p class="text-muted">
-            <a class="btn btn-info btn-sm  mt-1 mb-1" href="{% url 'comment-update' comment.id %}">Edit</a>
-            <a class="btn btn-danger btn-sm  mt-1 mb-1" href="{% url 'comment-delete' comment.id %}">Delete</a>
-          </p>
-        </div>
-      </article>
-    </fieldset>
-
-      {% endfor %}
+        {% for comment in comments %}
+        <article class="media">
+          <img class="rounded-circle article-img" src="{{ comment.author.profile.image.url }}"/>
+          <div class="media-body">
+            <h6 class="text-muted">
+              {% if comment.date_edited %}
+              <i>{{comment.author.username}}</i> commented on <i>{{comment.date_created|date:"F d, Y"}}</i> 
+              <br/><h7 class="small text-muted">edited on <i>{{comment.date_edited|date:"F d, Y"}}</i></h7>
+              {% else %}
+              <i>{{comment.author.username}}</i> commented on <i>{{comment.date_created|date:"F d, Y"}}</i>
+              {% endif %}
+            </h6>
+            <h5><a class="article-title">{{ comment.text }}</a></h5>
+            <p class="text-muted">
+              <a class="btn btn-info btn-sm  mt-1 mb-1" href="{% url 'comment-update' comment.id %}">Edit</a>
+              <a class="btn btn-danger btn-sm  mt-1 mb-1" href="{% url 'comment-delete' comment.id %}">Delete</a>
+            </p>
+          </div>
+        </article>
+        {% endfor %}
+      </fieldset>
+      <br/>
       <form action="{% url 'issue-detail' object.id %}" method="POST">
           {% csrf_token %}
           <fieldset class=form-group>

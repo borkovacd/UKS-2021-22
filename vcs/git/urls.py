@@ -63,6 +63,12 @@ urlpatterns = [
          views.apply_label, name='apply-label'),
     path('issues/<int:issue_id>/set-label/<int:label_id>/remove/',
          views.remove_label, name='remove-label'),
+    path('issues/<int:issue_id>/set-assignees/',
+         views.set_assignees_view, name='set-assignees-view'),
+    path('issues/<int:issue_id>/add-assignee/<int:assignee_id>/add/',
+         views.add_assignee, name='add-assignee'),
+    path('issues/<int:issue_id>/remove-assignee/<int:assignee_id>/remove/',
+         views.remove_assignee, name='remove-assignee'),
 
 
     path('comment/<int:pk>/delete/',
