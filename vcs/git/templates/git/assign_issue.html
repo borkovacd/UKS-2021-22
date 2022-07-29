@@ -22,9 +22,6 @@
         <div class="row" style="margin: auto">
         <h2 class="article-title">
           {{ assignee.username }}
-          {% if assignee == issue.author%}
-             (me)
-          {% endif %}
           <a class="article-title" style="color: red" href="{% url 'remove-assignee' issue.id assignee.id %}">
             <i class="fa-solid fa-circle-minus"></i>
           </a>
@@ -40,9 +37,6 @@
       <div class="row" style="margin: auto">
         <h2 class="article-title">
           {{ assignee.username }}
-          {% if assignee == issue.author%}
-             (me)
-          {% endif %}
           <a class="article-title" style="color: green" href="{% url 'add-assignee' issue.id assignee.id %}">
             <i class="fa-solid fa-circle-plus"></i>
           </a>
