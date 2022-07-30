@@ -356,6 +356,23 @@ class IssueDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         return False
 
 
+class IssueUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = Issue
+    fields = ['title', 'description']
+
+    def form_valid(self, form):
+        issue_title = form.cleaned_data['title']
+        messages.success(
+            self.request, f'The issue "{issue_title}" was updated successfully!')
+        return super().form_valid(form)
+
+    def test_func(self):
+        issue = self.get_object()
+        if self.request.user == issue.author:
+            return True
+        return False
+
+
 class CommentDeleteView(LoginRequiredMixin, DeleteView):
     model = Comment
 
