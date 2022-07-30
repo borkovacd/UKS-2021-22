@@ -4,6 +4,7 @@ from django.urls import reverse
 from django.utils import timezone
 from colorfield.fields import ColorField
 from colorful.fields import RGBColorField
+from enum import Enum
 
 # Create your models here.
 GENERAL_STATES = (
@@ -11,6 +12,11 @@ GENERAL_STATES = (
     ('CLOSE', 'Close'),
     ('MERGED', 'Merged')
 )
+
+
+class Issue_State(Enum):
+    OPEN = 1
+    CLOSED = 2
 
 
 class Project(models.Model):
@@ -51,5 +57,43 @@ class Label(models.Model):
     description = models.CharField(max_length=100, blank=True)
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
 
+    def __str__(self):
+        return str(self.title)
+
     def get_absolute_url(self):
         return reverse("project-detail", kwargs={"pk": self.project.pk})
+
+
+class Issue(models.Model):
+    title = models.CharField(max_length=100)
+    description = models.CharField(max_length=100, blank=True)
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    date_created = models.DateTimeField(default=timezone.now)
+    date_closed = models.DateTimeField(null=True)
+    is_open = models.BooleanField(default=True)
+    milestone = models.ForeignKey(
+        Milestone, on_delete=models.CASCADE, blank=True, null=True)
+    labels = models.ManyToManyField(Label, blank=True)
+    assignees = models.ManyToManyField(
+        User, related_name='assignees', blank=True)
+
+    def __str__(self):
+        return str(self.title)
+
+    def get_absolute_url(self):
+        return reverse("project-detail", kwargs={"pk": self.project.pk})
+
+
+class Comment(models.Model):
+    text = models.CharField(max_length=100)
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    issue = models.ForeignKey(Issue, on_delete=models.CASCADE)
+    date_created = models.DateTimeField(default=timezone.now)
+    date_edited = models.DateTimeField(null=True)
+
+    def __str__(self):
+        return str(self.text)
+
+    def get_absolute_url(self):
+        return reverse("issue-detail", kwargs={"pk": self.issue.pk})

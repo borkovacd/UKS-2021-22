@@ -1,0 +1,61 @@
+{% extends "git/base.html" %}
+{% block content %}
+  <div class="media-body ml-3">
+    <h2 class="article-title">
+    {{ issue.title }}
+    </h2>
+  <h6 class="text-muted">
+    {{issue.description}}
+  </h6>
+  <p class="text-muted">
+    #{{issue.id}} opened <i>{{issue.date_created|date:"F d, Y"}}</i> by <i>{{issue.author}}</i>
+    {% if issue.is_open == False %}
+      #{{issue.id}} was closed on <i>{{issue.date_closed|date:"F d, Y"}}</i>
+    {% endif %}
+  </p> 
+</div>
+  
+  <hr />
+
+    {% for milestone in milestones %}
+    {% if issue.milestone.id == milestone.id %}
+        <article class="media content-section">
+          <div class="media-body">
+            <h2><a style="color: green" class="article-title"> <i class="fa-solid fa-circle-check mr-2"></i>{{ milestone.title }}</a></h2>
+            <p class="text-muted ml-3 mt-3">
+              <i class="fa fa-calendar"></i>
+              <strong class="mr-3">due date: {{milestone.due_date|date:"F d, Y"}}</strong>
+              opened {{milestone.date_created|date:"F d, Y"}}             
+              <p class="text-muted ml-3">
+                {{milestone.description}}
+              </p>
+              <span class="col-xs-1 ml-3">
+               <a class="btn btn-sm btn-danger" href="{% url 'clear-milestone' issue.id milestone.id %}">Clear</a> 
+            </span>
+          </div>
+        </article>
+     {% else %}
+              <article class="media content-section">
+          <div class="media-body">
+            <h2><a class="article-title" >{{ milestone.title }}</a></h2>
+            <p class="text-muted ml-3 mt-3">
+              <i class="fa fa-calendar"></i>
+              <strong style="margin-right: 15px">due date: {{milestone.due_date|date:"F d, Y"}}</strong>
+              opened {{milestone.date_created|date:"F d, Y"}}             
+              </p>
+              <p class="text-muted ml-3">
+                {{milestone.description}}
+              </p>
+          <a class="btn btn-sm btn-success ml-3" href="{% url 'set-milestone' issue.id milestone.id %}">Set
+          </a>
+          </div>
+        </article>
+     {% endif %}   
+       {% empty %}
+          <p>There are currently no milestones reported with this filter</p>
+    {% endfor %}
+{% endblock content %}
+
+
+
+

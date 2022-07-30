@@ -1,0 +1,67 @@
+{% extends "git/base.html" %}
+{% block content %}
+  <div class="media-body ml-3">
+    <h2 class="article-title">
+    {{ issue.title }}
+    </h2>
+  <h6 class="text-muted">
+    {{issue.description}}
+  </h6>
+  <p class="text-muted">
+    #{{issue.id}} opened <i>{{issue.date_created|date:"F d, Y"}}</i> by <i>{{issue.author}}</i>
+    {% if issue.is_open == False %}
+      #{{issue.id}} was closed on <i>{{issue.date_closed|date:"F d, Y"}}</i>
+    {% endif %}
+  </p> 
+  </div>
+<hr />
+  {% for label in issue.labels.all %}
+    <article class="media">
+      <div class="media-body">
+        <h2>
+          <a class="article-title"> 
+            <span class="badge mt-2 ml-3" style="background-color: {{label.color}} !important; color: white;">
+              {{label.title}}
+          </span>
+          </a>
+          <a class="article-title" style="color: red" href="{% url 'remove-label' issue.id label.id %}">
+             <i class="fa-solid fa-circle-minus"></i>
+          </a>
+        </h2>        
+          <p class="text-muted ml-3">
+            {{label.description}}
+          </p>
+      </div>
+    </article>
+  {% endfor %}
+
+  {% for label in applicable_labels %}
+    <article class="media">
+      <div class="media-body">
+        <h2>
+          <a class="article-title"> 
+            <span class="badge mt-3 ml-3" style="background-color: {{label.color}} !important; color: white;">
+              {{label.title}}
+          </span>
+          </a>
+          <a class="article-title" style="color: green" href="{% url 'apply-label' issue.id label.id %}">
+             <i class="fa-solid fa-circle-plus"></i>
+          </a>
+        </h2>        
+          <p class="text-muted ml-3">
+            {{label.description}}
+          </p>
+      </div>
+    </article>
+
+
+
+
+  {% endfor %}
+
+
+{% endblock content %}
+
+
+
+

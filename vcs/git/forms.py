@@ -1,7 +1,9 @@
 from django import forms
 from .models import (
+    Issue,
     Project,
-    Label
+    Label,
+    Comment
 )
 from django.contrib.auth.models import User
 from django.db.models import Q
@@ -32,3 +34,15 @@ class LabelForm(forms.ModelForm):
     class Meta:
         model = Label
         fields = ['title', 'color', 'description']
+
+
+class IssueForm(forms.ModelForm):
+    class Meta:
+        model = Issue
+        fields = ['title', 'description', 'milestone', 'labels', 'assignees']
+
+
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ['text']
