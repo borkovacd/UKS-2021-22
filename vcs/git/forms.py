@@ -1,5 +1,6 @@
 from django import forms
 from .models import (
+    Milestone,
     Issue,
     Project,
     Label,
@@ -7,6 +8,10 @@ from .models import (
 )
 from django.contrib.auth.models import User
 from django.db.models import Q
+
+
+class DateInput(forms.DateInput):
+    input_type = "date"
 
 
 class CollaboratorsForm(forms.ModelForm):
@@ -28,6 +33,13 @@ class CollaboratorsForm(forms.ModelForm):
     def __setIsCollaborationPossibleFlag(self):
         if not self.fields['collaborators'].queryset:
             self.IsCollaborationPossible = False
+
+
+class MilestoneForm(forms.ModelForm):
+    class Meta:
+        model = Milestone
+        fields = ['title', 'description', 'due_date']
+        widgets = {'due_date': DateInput()}
 
 
 class LabelForm(forms.ModelForm):

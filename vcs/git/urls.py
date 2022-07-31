@@ -11,6 +11,9 @@ from .views import (
     LabelCreateView,
     LabelUpdateView,
     LabelDeleteView,
+    MilestoneCreateView,
+    MilestoneUpdateView,
+    MilestoneDeleteView,
     ProjectCreateView,
     ProjectListView,
     ProjectDetailView,
@@ -34,14 +37,14 @@ urlpatterns = [
     path('project/<int:project_id>/collaborators/<int:collaborator_id>/delete/',
          views.delete_collaborator, name='collaborator-delete'),
 
-    path('milestones/<int:project_id>', views.milestones, name='milestones'),
-    path('milestone-form/<int:project_id>',
-         views.milestone_form, name='milestone-form'),
-    path('new-milestone/<int:project_id>',
-         views.new_milestone, name='new-milestone'),
-    path('delete-milestone/<int:milestone_id>/<int:project_id>',
-         views.delete_milestone, name='delete-milestone'),
-
+    # MILESTONES
+    path('project/<int:project_id>/new-milestone/',
+         MilestoneCreateView.as_view(), name='milestone-create'),
+    path('milestones/<int:pk>/update/',
+         MilestoneUpdateView.as_view(), name='milestone-update'),
+    path('milestones/<int:pk>/delete/',
+         MilestoneDeleteView.as_view(), name='milestone-delete'),
+    # LABELS
     path('project/<int:project_id>/new-label/',
          LabelCreateView.as_view(), name='label-create'),
     path('label/<int:pk>/update/', LabelUpdateView.as_view(), name='label-update'),

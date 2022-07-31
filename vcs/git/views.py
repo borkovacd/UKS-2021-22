@@ -27,7 +27,8 @@ from .forms import (
     CollaboratorsForm,
     IssueForm,
     LabelForm,
-    CommentForm
+    CommentForm,
+    MilestoneForm
 )
 from django.contrib.auth.models import User
 from django.db.models import Q
@@ -37,6 +38,8 @@ from django.views.generic.edit import FormMixin
 
 def home(request):
     return render(request, 'git/home.html')
+
+# MILESTONES
 
 
 def milestones(request, project_id):
@@ -49,42 +52,67 @@ def milestones(request, project_id):
     return HttpResponse(template.render(context, request))
 
 
-def milestone_form(request, project_id):
-    template = loader.get_template('git/milestone-form.html')
-    milestone = ''
-    context = {
-        'milestone': milestone,
-        'project_id': project_id
-    }
-    return HttpResponse(template.render(context, request))
+class MilestoneCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
+    model = Milestone
+    form_class = MilestoneForm
 
-
-def new_milestone(request, project_id):
-    if request.method == 'POST':
-        project = Project.objects.get(id=project_id)
-        milestone = Milestone.objects.create(
-            title=request.POST['title'],
-            description=request.POST['description'],
-            due_date=request.POST['due_date'],
-            state='OPEN',
-            project=project
-        )
-        milestone.save()
+    def form_valid(self, form):
+        form.instance.project = Project.objects.get(
+            id=self.kwargs['project_id'])
+        milestone_title = form.cleaned_data['title']
         messages.success(
-            request, f'The milestone "{milestone.title}" was added successfully!')
-        return redirect(reverse('project-detail', args=[project_id]))
-    else:
-        project_id = request.path.split('/')[-1]
-        template = loader.get_template('git/milestone-form.html')
-        context = {'project_id': project_id}
-        return HttpResponse(template.render(context, request))
+            self.request, f'The milestone "{milestone_title}" was created successfully!')
+        return super().form_valid(form)
+
+    def test_func(self):
+        project = Project.objects.get(
+            id=self.kwargs['project_id'])
+        if self.request.user == project.owner:
+            return True
+        if self.request.user in project.collaborators.all():
+            return True
+        return False
 
 
-def delete_milestone(request, milestone_id, project_id):
-    if request.method == 'POST':
-        milestone = Milestone.objects.get(id=milestone_id)
-        milestone.delete()
-        return HttpResponseRedirect(reverse('milestones', kwargs={'project_id': project_id}))
+class MilestoneDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    model = Milestone
+
+    def get_success_url(self):
+        project = self.object.project
+        messages.success(
+            self.request, f'The milestone "{self.object.title}" was removed successfully!')
+        return reverse('project-detail', args=[project.id])
+
+    def test_func(self):
+        milestone = Milestone.objects.get(
+            id=self.kwargs['pk'])
+        project = milestone.project
+        if self.request.user == project.owner:
+            return True
+        if self.request.user in project.collaborators.all():
+            return True
+        return False
+
+
+class MilestoneUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = Milestone
+    form_class = MilestoneForm
+
+    def form_valid(self, form):
+        milestone_title = form.cleaned_data['title']
+        messages.success(
+            self.request, f'The milestone "{milestone_title}" was updated successfully!')
+        return super().form_valid(form)
+
+    def test_func(self):
+        milestone = Milestone.objects.get(
+            id=self.kwargs['pk'])
+        project = milestone.project
+        if self.request.user == project.owner:
+            return True
+        if self.request.user in project.collaborators.all():
+            return True
+        return False
 
 
 def project_form(request):
@@ -94,29 +122,6 @@ def project_form(request):
         'project': project
     }
     return HttpResponse(template.render(context, request))
-
-
-# function based create project function
-
-
-# def new_project(request):
-#     if request.method == 'POST':
-#         project = Project.objects.create(
-#             title=request.POST['title'],
-#             description=request.POST['description'],
-#             git_repo=request.POST['git_repo'],
-#             owner=request.user
-#         )
-#         project.save()
-#         messages.success(
-#             request, f'The project "{project.title}" was added successfully!')
-#     else:
-#         template = loader.get_template('vcs/new_project.html')
-#         context = {}
-#         return HttpResponse(template.render(context, request))
-#     return HttpResponseRedirect(project.get_absolute_url())
-
-# class based create project function
 
 
 class ProjectCreateView(LoginRequiredMixin, CreateView):
