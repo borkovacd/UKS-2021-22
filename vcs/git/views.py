@@ -17,6 +17,7 @@ from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from .models import (
     GENERAL_STATES,
+    Commit,
     Project,
     Issue,
     Milestone,
@@ -165,6 +166,8 @@ class ProjectDetailView(DetailView):
         context['labels'] = Label.objects.filter(
             project_id=self.object)
         context['issues'] = Issue.objects.filter(
+            project_id=self.object)
+        context['commits'] = Commit.objects.filter(
             project_id=self.object)
 
         return context

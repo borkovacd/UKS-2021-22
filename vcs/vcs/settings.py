@@ -25,7 +25,8 @@ SECRET_KEY = 'django-insecure-(=bn))#ytiu^%76_t=%x9_yv-phd_1oa!+bw@01l7k2=@%z_1@
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+# TO DO: For testing github webhooks (Remove later)
+ALLOWED_HOSTS = ['335a-109-245-192-29.eu.ngrok.io', 'localhost']
 
 
 # Application definition
