@@ -4,7 +4,8 @@ from .models import (
     Issue,
     Milestone,
     Label,
-    Comment
+    Comment,
+    Commit
 )
 
 admin.site.register(Project)
@@ -12,3 +13,4 @@ admin.site.register(Issue)
 admin.site.register(Milestone)
 admin.site.register(Label)
 admin.site.register(Comment)
+admin.site.register(Commit)

@@ -2,6 +2,7 @@ from django.urls import path
 
 from git.models import Label
 from . import views
+from .webhooks import webhook_push
 from .views import (
     CommentDeleteView,
     CommentUpdateView,
@@ -81,6 +82,10 @@ urlpatterns = [
          CommentDeleteView.as_view(), name='comment-delete'),
     path('comment/<int:pk>/update/',
          CommentUpdateView.as_view(), name='comment-update'),
+
+    # WEBHOOKS
+    path('api/webhook_push/', webhook_push, name='webhook_push'),
+
 
 
 

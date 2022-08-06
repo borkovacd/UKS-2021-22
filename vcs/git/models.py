@@ -100,3 +100,25 @@ class Comment(models.Model):
 
     def get_absolute_url(self):
         return reverse("issue-detail", kwargs={"pk": self.issue.pk})
+
+
+class Commit(models.Model):
+    id = models.CharField(max_length=100, primary_key=True)
+    url = models.CharField(max_length=100)
+    message = models.CharField(max_length=100)
+    author = models.CharField(max_length=100)
+    date_created = models.DateTimeField(default=timezone.now)
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+
+    @classmethod
+    def create(cls, commit_url, commit_id, message, date_created, author, project):
+        new_state = cls(url=commit_url, id=commit_id, message=message, date_created=date_created,
+                        author=author, project=project)
+        new_state.save()
+        return new_state
+
+    def __str__(self):
+        return str(self.message)
+
+    def get_absolute_url(self):
+        return reverse("project-detail", kwargs={"pk": self.project.pk})
