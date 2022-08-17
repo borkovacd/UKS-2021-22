@@ -51,6 +51,7 @@ urlpatterns = [
     path('label/<int:pk>/update/', LabelUpdateView.as_view(), name='label-update'),
     path('label/<int:pk>/delete/', LabelDeleteView.as_view(), name='label-delete'),
 
+    # ISSUES
     path('project/<int:project_id>/new-issue/',
          views.add_issue, name='issue-create'),
     path('issues/<int:pk>/', IssueDetailView.as_view(), name='issue-detail'),
@@ -58,6 +59,10 @@ urlpatterns = [
          IssueDeleteView.as_view(), name='issue-delete'),
     path('issues/<int:pk>/update/',
          IssueUpdateView.as_view(), name='issue-update'),
+    path('issues/<int:issue_id>/close-issue/',
+         views.close_issue, name='close-issue'),
+    path('issues/<int:issue_id>/reopen-issue/',
+         views.reopen_issue, name='reopen-issue'),
     path('issues/<int:issue_id>/set-milestone/',
          views.set_milestone_view, name='set-milestone-view'),
     path('issues/<int:issue_id>/set-milestone/<int:milestone_id>/set/',
