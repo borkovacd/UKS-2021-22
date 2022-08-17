@@ -16,7 +16,6 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from .models import (
-    GENERAL_STATES,
     Commit,
     Project,
     Issue,
@@ -33,7 +32,11 @@ from .forms import (
 )
 from django.contrib.auth.models import User
 from django.db.models import Q
-from .test_functions import test_ownership, test_issue_permissions
+from .test_functions import (
+    test_ownership,
+    test_issue_permissions,
+    test_milestone_permissions
+)
 from django.views.generic.edit import FormMixin
 
 
@@ -513,3 +516,21 @@ def reopen_issue(request, issue_id):
     issue.is_open = True
     issue.save()
     return redirect(reverse('issue-detail', args=[issue_id]))
+
+
+@login_required
+@test_milestone_permissions
+def close_milestone(request, milestone_id):
+    milestone = get_object_or_404(Milestone, pk=milestone_id)
+    milestone.is_open = False
+    milestone.save()
+    return redirect(reverse('project-detail', args=[milestone.project.id]))
+
+
+@login_required
+@test_milestone_permissions
+def reopen_milestone(request, milestone_id):
+    milestone = get_object_or_404(Milestone, pk=milestone_id)
+    milestone.is_open = True
+    milestone.save()
+    return redirect(reverse('project-detail', args=[milestone.project.id]))

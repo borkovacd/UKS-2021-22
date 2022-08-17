@@ -45,6 +45,11 @@ urlpatterns = [
          MilestoneUpdateView.as_view(), name='milestone-update'),
     path('milestones/<int:pk>/delete/',
          MilestoneDeleteView.as_view(), name='milestone-delete'),
+    path('milestones/<int:milestone_id>/close-milestone/',
+         views.close_milestone, name='close-milestone'),
+    path('milestones/<int:milestone_id>/reopen-milestone/',
+         views.reopen_milestone, name='reopen-milestone'),
+
     # LABELS
     path('project/<int:project_id>/new-label/',
          LabelCreateView.as_view(), name='label-create'),
