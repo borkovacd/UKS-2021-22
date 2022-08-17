@@ -81,8 +81,12 @@ WSGI_APPLICATION = 'vcs.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'uks.vcs.database',
+        'USER': 'postgres',
+        'PASSWORD': 'testing321',
+        'HOST': 'localhost',
+        'PORT': '',
     }
 }
 
