@@ -494,3 +494,22 @@ def remove_assignee(request, issue_id, assignee_id):
     issue.assignees.set(issue.assignees.exclude(id=assignee_id))
     issue.save()
     return redirect(reverse('issue-detail', args=[issue_id]))
+
+
+@login_required
+@test_issue_permissions
+def close_issue(request, issue_id):
+    issue = get_object_or_404(Issue, pk=issue_id)
+    issue.is_open = False
+    issue.date_closed = timezone.now()
+    issue.save()
+    return redirect(reverse('issue-detail', args=[issue_id]))
+
+
+@login_required
+@test_issue_permissions
+def reopen_issue(request, issue_id):
+    issue = get_object_or_404(Issue, pk=issue_id)
+    issue.is_open = True
+    issue.save()
+    return redirect(reverse('issue-detail', args=[issue_id]))
