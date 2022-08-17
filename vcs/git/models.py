@@ -6,18 +6,6 @@ from colorfield.fields import ColorField
 from colorful.fields import RGBColorField
 from enum import Enum
 
-# Create your models here.
-GENERAL_STATES = (
-    ('OPEN', 'Open'),
-    ('CLOSE', 'Close'),
-    ('MERGED', 'Merged')
-)
-
-
-class Issue_State(Enum):
-    OPEN = 1
-    CLOSED = 2
-
 
 class Project(models.Model):
     title = models.CharField(max_length=32)
@@ -40,11 +28,7 @@ class Milestone(models.Model):
     title = models.CharField(max_length=200, blank=False)
     due_date = models.DateTimeField(null=True, blank=True)
     description = models.TextField(max_length=300, blank=True)
-    state = models.CharField(
-        max_length=6,
-        choices=GENERAL_STATES,
-        default='OPEN',
-    )
+    is_open = models.BooleanField(default=True)
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
 
     def __str__(self):

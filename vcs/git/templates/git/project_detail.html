@@ -113,6 +113,11 @@
         </h5>
       </div>
       <a class="btn btn-info btn-sm mt-2" href="{% url 'milestone-update' milestone.id %}">Edit</a>
+      {% if milestone.is_open == True %}
+        <a class="btn btn-warning btn-sm ml-2 mt-2" href="{% url 'close-milestone' milestone.id %}">Close</a>
+      {% else %}
+        <a class="btn btn-warning btn-sm ml-2 mt-2" href="{% url 'reopen-milestone' milestone.id %}">Reopen</a>
+      {% endif %}
       <a class="btn btn-danger btn-sm mt-2 ml-2" href="{% url 'milestone-delete' milestone.id %}">Delete</a>
     </article>
     {% empty %}
