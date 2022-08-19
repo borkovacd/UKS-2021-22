@@ -43,6 +43,76 @@ from django.views.generic.edit import FormMixin
 def home(request):
     return render(request, 'git/home.html')
 
+# PROJECTS
+
+
+class ProjectCreateView(LoginRequiredMixin, CreateView):
+    model = Project
+    fields = ['title', 'description', 'git_repo']
+
+    def form_valid(self, form):
+        form.instance.owner = self.request.user
+        return super().form_valid(form)
+
+
+class ProjectUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = Project
+    fields = ['title', 'description', 'git_repo']
+
+    def form_valid(self, form):
+        form.instance.owner = self.request.user
+        return super().form_valid(form)
+
+    def test_func(self):
+        project = self.get_object()
+        if self.request.user == project.owner:
+            return True
+        return False
+
+
+class ProjectListView(ListView):
+    model = Project
+    template_name = 'git/home.html'  # <app>/<model>_<viewtype>.html
+    # by default it expects this: git/project_list.html
+    context_object_name = 'projects'
+
+
+def projects(request):
+    projects = Project.objects.all()
+    template = loader.get_template('git/projects.html')
+    context = {
+        'projects': projects,
+    }
+    return HttpResponse(template.render(context, request))
+
+
+class ProjectDetailView(DetailView):
+    model = Project
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['milestones'] = Milestone.objects.filter(
+            project_id=self.object)
+        context['labels'] = Label.objects.filter(
+            project_id=self.object)
+        context['issues'] = Issue.objects.filter(
+            project_id=self.object)
+        context['commits'] = Commit.objects.filter(
+            project_id=self.object)
+
+        return context
+
+
+class ProjectDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    model = Project
+    success_url = '/'
+
+    def test_func(self):
+        project = self.get_object()
+        if self.request.user == project.owner:
+            return True
+        return False
+
 # MILESTONES
 
 
@@ -128,80 +198,6 @@ def project_form(request):
     return HttpResponse(template.render(context, request))
 
 
-class ProjectCreateView(LoginRequiredMixin, CreateView):
-    model = Project
-    fields = ['title', 'description', 'git_repo']
-
-    def form_valid(self, form):
-        form.instance.owner = self.request.user
-        return super().form_valid(form)
-
-
-# class based PROJECTS view
-
-
-class ProjectListView(ListView):
-    model = Project
-    template_name = 'git/home.html'  # <app>/<model>_<viewtype>.html
-    # by default it expects this: git/project_list.html
-    context_object_name = 'projects'
-
-
-# function based PROJECTS view
-
-
-def projects(request):
-    projects = Project.objects.all()
-    template = loader.get_template('git/projects.html')
-    context = {
-        'projects': projects,
-    }
-    return HttpResponse(template.render(context, request))
-
-
-class ProjectDetailView(DetailView):
-    model = Project
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['milestones'] = Milestone.objects.filter(
-            project_id=self.object)
-        context['labels'] = Label.objects.filter(
-            project_id=self.object)
-        context['issues'] = Issue.objects.filter(
-            project_id=self.object)
-        context['commits'] = Commit.objects.filter(
-            project_id=self.object)
-
-        return context
-
-
-class ProjectUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
-    model = Project
-    fields = ['title', 'description', 'git_repo']
-
-    def form_valid(self, form):
-        form.instance.owner = self.request.user
-        return super().form_valid(form)
-
-    def test_func(self):
-        project = self.get_object()
-        if self.request.user == project.owner:
-            return True
-        return False
-
-
-class ProjectDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
-    model = Project
-    success_url = '/'
-
-    def test_func(self):
-        project = self.get_object()
-        if self.request.user == project.owner:
-            return True
-        return False
-
-
 ### COLLABORATORS ###
 
 
@@ -262,7 +258,7 @@ def delete_collaborator(request, project_id, collaborator_id):
 # LABELS
 
 
-class LabelCreateView(LoginRequiredMixin, CreateView):
+class LabelCreateView(LoginRequiredMixin, UserPassesTestMixin,  CreateView):
     model = Label
     fields = ['title', 'color', 'description']
 
@@ -274,8 +270,18 @@ class LabelCreateView(LoginRequiredMixin, CreateView):
             self.request, f'The label "{label_title}" was created successfully!')
         return super().form_valid(form)
 
+    def test_func(self):
+        label = Label.objects.get(
+            id=self.kwargs['project_id'])
+        project = label.project
+        if self.request.user == project.owner:
+            return True
+        if self.request.user in project.collaborators.all():
+            return True
+        return False
 
-class LabelDeleteView(LoginRequiredMixin, DeleteView):
+
+class LabelDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Label
 
     def get_success_url(self):
@@ -284,8 +290,18 @@ class LabelDeleteView(LoginRequiredMixin, DeleteView):
             self.request, f'The label "{self.object.title}" was removed successfully!')
         return reverse('project-detail', args=[project.id])
 
+    def test_func(self):
+        label = Label.objects.get(
+            id=self.kwargs['pk'])
+        project = label.project
+        if self.request.user == project.owner:
+            return True
+        if self.request.user in project.collaborators.all():
+            return True
+        return False
 
-class LabelUpdateView(LoginRequiredMixin, UpdateView):
+
+class LabelUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Label
     form_class = LabelForm
 
@@ -294,6 +310,16 @@ class LabelUpdateView(LoginRequiredMixin, UpdateView):
         messages.success(
             self.request, f'The label "{label_title}" was updated successfully!')
         return super().form_valid(form)
+
+    def test_func(self):
+        label = Label.objects.get(
+            id=self.kwargs['pk'])
+        project = label.project
+        if self.request.user == project.owner:
+            return True
+        if self.request.user in project.collaborators.all():
+            return True
+        return False
 
 
 # ISSUES
