@@ -25,6 +25,7 @@ from .views import (
 urlpatterns = [
     path('', ProjectListView.as_view(), name='git-home'),
 
+    # PROJECTS
     path('projects/', views.projects, name='projects'),
     path('new-project/', ProjectCreateView.as_view(), name='project-create'),
     path('project/<int:pk>/', ProjectDetailView.as_view(), name="project-detail"),
