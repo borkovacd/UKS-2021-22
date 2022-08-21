@@ -25,7 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-(=bn))#ytiu^%76_t=%x9_yv-phd_1oa!+bw@01l7k2=@%z_1@'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DEBUG_VALUE')
+DEBUG = (os.environ.get('DEBUG_VALUE') == 'True')
 
 # TO DO: For testing github webhooks (Remove later)
 ALLOWED_HOSTS = [
