@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -23,10 +24,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-(=bn))#ytiu^%76_t=%x9_yv-phd_1oa!+bw@01l7k2=@%z_1@'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DEBUG_VALUE')
 
 # TO DO: For testing github webhooks (Remove later)
-ALLOWED_HOSTS = ['335a-109-245-192-29.eu.ngrok.io', 'localhost']
+ALLOWED_HOSTS = [
+    '335a-109-245-192-29.eu.ngrok.io',
+    'localhost',
+    'uks-vcs.herokuapp.com'
+]
 
 
 # Application definition
