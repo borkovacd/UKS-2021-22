@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
 from pathlib import Path
+import os
+import django_heroku
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -23,10 +25,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-(=bn))#ytiu^%76_t=%x9_yv-phd_1oa!+bw@01l7k2=@%z_1@'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = (os.environ.get('DEBUG_VALUE') == 'True')
 
 # TO DO: For testing github webhooks (Remove later)
-ALLOWED_HOSTS = ['335a-109-245-192-29.eu.ngrok.io', 'localhost']
+ALLOWED_HOSTS = [
+    '335a-109-245-192-29.eu.ngrok.io',
+    'localhost',
+    'uks-vcs.herokuapp.com'
+]
 
 
 # Application definition
@@ -125,6 +131,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATIC_URL = '/static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
@@ -138,3 +145,5 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 LOGIN_REDIRECT_URL = 'git-home'
 LOGIN_URL = 'login'
+
+django_heroku.settings(locals())
