@@ -1,0 +1,26 @@
+version: '3'
+
+services:
+  db:
+    image: postgres
+    environment:
+       - POSTGRES_DB=uks.vcs.database
+       - POSTGRES_USER=postgres
+       - POSTGRES_PASSWORD=testing321
+  web:
+    build:
+      context: .
+    image: borkovac/uks:latest
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./vcs:/vcs
+    environment:
+       - DB_HOST=db
+       - DB_NAME=uks.vcs.database
+       - DB_USER=postgres
+       - DB_PASSWORD=testing321
+       - DEBUG_VALUE=True
+    depends_on:
+      - db
+        
