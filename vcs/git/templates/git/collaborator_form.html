@@ -1,0 +1,21 @@
+{% extends "git/base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+<div class="content-section">
+    <form method="POST">
+        {% csrf_token %}
+        <fieldset class="form-group">
+            <legend class="border-bottom mb-4">Add a collaborator</legend>
+            {% if form.IsCollaborationPossible is False %} 
+            <h4>Currently, there's no possible user to collaboratorate with. <i class="fa-regular fa-face-frown"></i></h4>
+            {% else  %}
+                {{ form|crispy }}
+                <div class="form-group">
+                    <button class="btn btn-outline-info" type="submit">Add</button>
+                </div>
+            {% endif %}
+        </fieldset>  
+    </form>
+    <a class="btn btn-secondary" href="{% url 'project-detail' project.id %}">Cancel</a>
+</div>
+{% endblock content %}

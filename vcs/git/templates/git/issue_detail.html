@@ -1,0 +1,140 @@
+{% extends "git/base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+<article class="media content-section">
+  <div class="media-body">
+    <div class="row" style="display: flex; justify-content: space-between">
+      <h2 class="article-title ml-3">
+        {% if object.is_open  %}
+          <i class="fa fa-solid fa-circle-dot" style="color: green;"></i>
+        {% else %}
+          <i class="fa fa-solid fa-circle-dot" style="color: red;"></i>
+        {% endif %}{{ object.title }}
+      </h2>
+      <div class="mr-3">
+      {% if object.is_open  %}
+          <a href="{% url 'close-issue' object.id %}">
+            <button type="button" class="btn btn-danger mt-1">Close issue</button>
+          </a>
+      {% else %}
+          <a href="{% url 'reopen-issue' object.id %}">
+            <button type="button" class="btn btn-success mt-1">Reopen issue</button>
+          </a>
+      {% endif %}
+      </div>
+    </div>
+    <h6 class="text-muted">
+      {{object.description}}
+    </h6>
+    <p class="text-muted">
+      {% if object.is_open == True %}
+        #{{object.id}} opened <i>{{object.date_created|date:"F d, Y"}}</i> by <i>{{object.author}}</i>
+      {% else %}
+        #{{object.id}} by <i>{{object.author}}</i> was closed on <i>{{object.date_closed|date:"F d, Y"}}</i>
+      {% endif %}
+    </p> 
+    <hr/>
+    <div>
+    
+      <a class="ml-3" href="set-milestone/">
+        <strong>Milestone</strong>
+        <i class="ml-1 fa-solid fa-gear"></i>
+      </a>  
+
+    <p>
+      {% if object.milestone is not None %}
+        <span class="badge badge-warning mt-2 ml-3" style="font-size: larger">
+          {{object.milestone.title}}
+        </span>
+      {% else %}
+        <span class="ml-3"><i>No milestone</i></span>
+      {% endif %}
+    </p>
+    
+    
+  </div>
+  <hr/>
+
+  <hr/>
+  <div>    
+    <a class="ml-3" href="set-label/">
+      <strong>Labels</strong>
+      <i class="ml-1 fa-solid fa-gear"></i>
+    </a>
+    <div>
+    {% if not object.labels.all %}
+      <span class="ml-3"><i>No labels</i></span>
+    {% else %}
+    {% for label in object.labels.all %}
+      <span class="badge mt-2 ml-3" style="background-color: {{label.color}} !important; color: white; font-size: larger">
+        {{label.title}}
+    </span>
+    {% endfor %}
+    {% endif %}
+    <div></div>
+  </div>
+  <hr/>
+
+  <hr/>
+  <div>
+    <a class="ml-3" href="set-assignees/">
+      <strong>Assignees</strong>
+      <i class="ml-1 fa-solid fa-gear"></i>
+    </a>
+    <div>
+    {% if not object.assignees.all %}
+      <span class="ml-3"><i>No assignees</i></span>
+    {% else %}
+    {% for user in object.assignees.all %}
+      <span class="badge badge-warning mt-2 ml-3" style="font-size: larger">
+        {{user.username}}
+    </span>
+    {% endfor %}
+    {% endif %}
+    <div></div>
+  </div>
+  </div> 
+
+
+
+  </div>
+ 
+</article>
+<article>
+     <div class="content-section">
+      <fieldset class=form-group>
+        <legend class="border-bottom mb-4"><h4>Comments</h4></legend>
+        {% for comment in comments %}
+        <article class="media">
+          <img class="rounded-circle article-img" src="{{ comment.author.profile.image.url }}"/>
+          <div class="media-body">
+            <h6 class="text-muted">
+              {% if comment.date_edited %}
+              <i>{{comment.author.username}}</i> commented on <i>{{comment.date_created|date:"F d, Y"}}</i> 
+              <br/><h7 class="small text-muted">edited on <i>{{comment.date_edited|date:"F d, Y"}}</i></h7>
+              {% else %}
+              <i>{{comment.author.username}}</i> commented on <i>{{comment.date_created|date:"F d, Y"}}</i>
+              {% endif %}
+            </h6>
+            <h5><a class="article-title">{{ comment.text }}</a></h5>
+            <p class="text-muted">
+              <a class="btn btn-info btn-sm  mt-1 mb-1" href="{% url 'comment-update' comment.id %}">Edit</a>
+              <a class="btn btn-danger btn-sm  mt-1 mb-1" href="{% url 'comment-delete' comment.id %}">Delete</a>
+            </p>
+          </div>
+        </article>
+        {% endfor %}
+      </fieldset>
+      <br/>
+      <form action="{% url 'issue-detail' object.id %}" method="POST">
+          {% csrf_token %}
+          <fieldset class=form-group>
+              <legend class="border-bottom mb-4"><h5>Write a new comment</h5></legend>
+              {{ form|crispy}}
+          </fieldset>
+          <div class="form-group">
+              <button class="btn btn-success" type="submit">Comment</button>
+          </div>
+      </form>
+    </article>
+{% endblock content %}

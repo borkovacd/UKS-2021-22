@@ -1,0 +1,36 @@
+{% extends 'git/base.html' %}
+
+{% block content %}
+<div class="row mb-3">
+    <div class="col-9"><h5>Milestones</h5></div>
+    <div class="col-3"><a href="{% url 'milestone-form' project_id %}">
+        <button class="btn btn-success">New milestone</button></a>
+    </div>
+</div>
+<table class="table">
+    <tbody>
+    {% if milestones %}
+        {% for milestone in milestones %}
+            <tr>
+                <td>
+                    <p class="font-weight-bold mb-1">{{milestone.title}}</p>
+                    <p class="font-italic">{{milestone.description}}</p>
+                </td>
+                <td>
+                    <p>{{milestone.state}}</p>
+                </td>
+                <td class="text-right">
+                    <button class="btn btn-info" >Edit</button>
+                    <form action="{% url 'delete-milestone' milestone.id milestone.project.id %}" method="post">
+                        {% csrf_token %}
+                        <input type="submit"  class="btn btn-danger" value="Delete"/>
+                    </form>
+                </td>
+            </tr>
+        {% endfor %}
+    {% else %}
+        <p>No Milestones are available.</p>
+    {% endif %}
+    </tbody>
+</table>
+{% endblock %}

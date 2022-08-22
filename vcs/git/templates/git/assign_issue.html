@@ -1,0 +1,54 @@
+{% extends "git/base.html" %}
+{% block content %}
+  <div class="media-body ml-3">
+    <h2 class="article-title">
+    {{ issue.title }}
+    </h2>
+  <h6 class="text-muted">
+    {{issue.description}}
+  </h6>
+  <p class="text-muted">
+    #{{issue.id}} opened <i>{{issue.date_created|date:"F d, Y"}}</i> by <i>{{issue.author}}</i>
+    {% if issue.is_open == False %}
+      #{{issue.id}} was closed on <i>{{issue.date_closed|date:"F d, Y"}}</i>
+    {% endif %}
+  </p> 
+  </div>
+<hr />
+  {% for assignee in issue.assignees.all %}
+    <article class="media content-section">
+      <img class="rounded-circle article-img" src="{{ assignee.profile.image.url }}" />
+      <div class="media-body" style="margin: auto">
+        <div class="row" style="margin: auto">
+        <h2 class="article-title">
+          {{ assignee.username }}
+          <a class="article-title" style="color: red" href="{% url 'remove-assignee' issue.id assignee.id %}">
+            <i class="fa-solid fa-circle-minus"></i>
+          </a>
+        </h2>
+      </div>
+    </article>
+  {% endfor %}
+
+  {% for assignee in available_assignees %}
+  <article class="media content-section">
+    <img class="rounded-circle article-img" src="{{ assignee.profile.image.url }}" />
+    <div class="media-body" style="margin: auto">
+      <div class="row" style="margin: auto">
+        <h2 class="article-title">
+          {{ assignee.username }}
+          <a class="article-title" style="color: green" href="{% url 'add-assignee' issue.id assignee.id %}">
+            <i class="fa-solid fa-circle-plus"></i>
+          </a>
+        </h2>
+      </div>
+    </div>
+  </article>
+  {% endfor %}
+
+
+{% endblock content %}
+
+
+
+

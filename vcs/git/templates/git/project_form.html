@@ -1,0 +1,40 @@
+{% extends "git/base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+    <div class="content-section">
+        <form method="POST">
+            {% csrf_token %}
+            <fieldset class="form-group">
+                <legend class="border-bottom mb-4"><i>Project details:</i></legend>
+                {{ form|crispy }}
+            </fieldset>
+            <div class="form-group">
+                <button class="btn btn-success mr-1" type="submit">Save</button>
+            </div>
+        </form>
+    </div>
+{% endblock content %}
+
+{% comment %} {% extends 'git/base.html' %} {% block content %}
+<h5>New project</h5>
+<form method="post" action="{% url 'new-project' %}">
+  {% csrf_token %}
+  <div class="row">
+    <div class="col-12 mb-2">
+      <p>Title:</p>
+      <input type="text" name="title" class="w-50" />
+    </div>
+    <div class="col-12 mb-2">
+        <p>Description:</p>
+        <textarea maxlength="300" type="text" name="description" class="w-50"></textarea>
+    </div>
+    <div class="col-12 mb-2">
+      <p>Git repository:</p>
+      <input type="text" name="git_repo" class="w-50" />
+    </div>
+    <div class="col-12">
+      <input type="submit" class="btn btn-success" value="Create project" />
+    </div>
+  </div>
+</form>
+{% endblock %} {% endcomment %}
