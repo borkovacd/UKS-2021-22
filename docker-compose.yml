@@ -21,6 +21,7 @@ services:
        - DB_USER=postgres
        - DB_PASSWORD=testing321
        - DEBUG_VALUE=True
+       - HOST_VALUE=db
     depends_on:
       - db
         
