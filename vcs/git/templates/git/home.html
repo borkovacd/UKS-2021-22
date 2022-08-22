@@ -10,21 +10,35 @@
         </div>
       </div>
       {% for project in projects %}
-          {% if user.is_authenticated and user.username == project.owner.username %}
-            <article class="media content-section">
-            <img class="rounded-circle article-img" src="{{ project.owner.profile.image.url }}">
-              <div class="media-body">
-                <div class="article-metadata">
-                  <span><i>owner: </i></span><a class="mr-2" href="{% url 'profile' %}">{{ project.owner }}</a>
+          {% if user.is_authenticated%}
+            {% if user.username == project.owner.username or user in project.collaborators.all %}
+              <article class="media content-section">
+              <img class="rounded-circle article-img" src="{{ project.owner.profile.image.url }}">
+                <div class="media-body">
+                  <div class="article-metadata">
+                    {% if user.username == project.owner.username %}
+                      <span><i>owner: </i></span><a class="mr-2" href="{% url 'profile' %}">{{ project.owner }}</a>
+                    {% else %}
+                      <span><i>owner: {{ project.owner }}</i></span>
+                    {% endif %}
+                  </div>
+                  <h2><a class="article-title" href="{% url 'project-detail' project.id %}">{{ project.title }}</a></h2>
+                  <p class="article-content"><i>{{ project.description }}</i></p>
+                  <a class="mr-2" href="{{ project.git_repo}}">View in GitHub</a>
                 </div>
-                <h2><a class="article-title" href="{% url 'project-detail' project.id %}">{{ project.title }}</a></h2>
-                <p class="article-content"><i>{{ project.description }}</i></p>
-                <a class="mr-2" href="{{ project.git_repo}}">View in GitHub</a>
-              </div>
-            </article>
+              </article>
+            {% endif %}
           {% endif %}
       {% endfor %}
     {% else %}
-    <h2><i>Log in to see your projects or create a new one</i></h2>
+    <h3 class="text muted mt-3"><i>Log in to see your projects or create a new one</i></h3>
+    <div class="row" style="display: flex; justify-content: space-between">
+      <div>&nbsp;</div>
+      <div>&nbsp;</div>
+      <div>
+        <a class="btn btn-success btn-lg  mt-4 ml-5" href="{% url 'login' %}">Login</a>
+      </div>
+      <div>&nbsp;</div>
+    </div>
     {% endif %}
 {% endblock content %}
