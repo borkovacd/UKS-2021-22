@@ -1,0 +1,110 @@
+@startuml
+
+class Project {
+    title: string
+    description: string
+    git_repo: string
+    date_created: timestamp
+    owner: User
+}
+
+class Issue {
+    title: string
+    description: string
+    author: User
+    date_created: timestamp
+    date_closed: timestamp  
+    is_open: bool
+}
+
+Project *-- "0..*" Issue
+
+class Milestone {
+    title: string
+    due_date: timestamp
+    description: string
+    is_open: bool
+}
+
+Project *--"0..*" Milestone
+
+class Label {
+    name: string
+    description: string
+    color: string
+}
+
+Project *--"0..*" Label
+
+class Commit {
+    id: string
+    url: string
+    author: User
+    message: string
+    date_created: timestamp  
+    is_open: bool
+}
+
+Project *--"0..*" Commit
+
+class User {
+    username: string
+    email: Email
+    password: string
+}
+
+Project "0..*"--"0..*" User: collaborators
+
+class Profile {
+    image: Image
+}
+
+User *--"0..1" Profile
+
+class Event {
+    creation_time: timestamp
+    author: User
+}
+
+Issue *--"1..*" Event
+
+class Comment {
+    text: string
+    date_created: timestamp
+    date_edited: timestamp
+}
+
+Event <|-- Comment
+
+class UpdateIssueStatus {
+    new_status: IssueStatus
+}
+
+Event <|-- UpdateIssueStatus
+
+class UpdateComment {
+    new_comment: Comment
+}
+
+Event <|-- UpdateComment
+
+class UpdateMilestone {
+    new_milestone: Milestone
+    new_status: MilestoneStatus
+}
+
+Event <|-- UpdateMilestone
+
+class UpdateLabel {
+    new_label: Label
+}
+
+Event <|-- UpdateLabel
+
+class UpdateAssignee {
+    new_assignee: User
+}
+
+Event <|-- UpdateAssignee
+
+@enduml
