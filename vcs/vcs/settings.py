@@ -91,7 +91,7 @@ DATABASES = {
         'NAME': 'uks.vcs.database',
         'USER': 'postgres',
         'PASSWORD': 'testing321',
-        'HOST': 'db',
+        'HOST': os.environ.get('HOST_VALUE'),
         'PORT': '',
     }
 }
