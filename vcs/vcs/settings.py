@@ -91,11 +91,10 @@ DATABASES = {
         'NAME': 'uks.vcs.database',
         'USER': 'postgres',
         'PASSWORD': 'testing321',
-        'HOST': 'localhost',
+        'HOST': 'db',
         'PORT': '',
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
