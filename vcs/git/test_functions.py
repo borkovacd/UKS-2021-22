@@ -17,9 +17,10 @@ def test_ownership(request, **kwargs):
 @request_passes_test
 def test_issue_permissions(request, **kwargs):
     issue = Issue.objects.get(id=kwargs['issue_id'])
-    if request.user == issue.author:
+    project = issue.project
+    if request.user == project.owner:
         return True
-    if request.user in issue.assignees.all():
+    if request.user in project.collaborators.all():
         return True
     return False
 

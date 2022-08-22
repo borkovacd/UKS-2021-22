@@ -257,7 +257,7 @@ def delete_collaborator(request, project_id, collaborator_id):
 # LABELS
 
 
-class LabelCreateView(LoginRequiredMixin, UserPassesTestMixin,  CreateView):
+class LabelCreateView(LoginRequiredMixin,  CreateView):
     model = Label
     fields = ['title', 'color', 'description']
 
@@ -268,16 +268,6 @@ class LabelCreateView(LoginRequiredMixin, UserPassesTestMixin,  CreateView):
         messages.success(
             self.request, f'The label "{label_title}" was created successfully!')
         return super().form_valid(form)
-
-    def test_func(self):
-        label = Label.objects.get(
-            id=self.kwargs['project_id'])
-        project = label.project
-        if self.request.user == project.owner:
-            return True
-        if self.request.user in project.collaborators.all():
-            return True
-        return False
 
 
 class LabelDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
@@ -328,12 +318,16 @@ class LabelUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 @test_ownership
 def add_issue(request, project_id):
     form = IssueForm(request.POST)
+    project = get_object_or_404(Project, pk=project_id)
     form.fields['milestone'].queryset = Milestone.objects.filter(
         project_id=project_id)
     form.fields['labels'].queryset = Label.objects.filter(
         project_id=project_id)
-    form.fields['assignees'].queryset = User.objects.filter(is_superuser=False).filter(
-        ~Q(id=request.user.id))
+    non_assignees = User.objects.filter(
+        is_superuser=False).exclude(id__in=[c.id for c in project.collaborators.all()]).filter(
+            ~Q(id=request.user.id))
+    form.fields['assignees'].queryset = User.objects.filter(
+        is_superuser=False).exclude(id__in=[c.id for c in non_assignees])
     if request.method == 'POST':
         if form.is_valid():
             new_issue = form.instance
@@ -448,6 +442,8 @@ def set_milestone(request, issue_id, milestone_id):
     milestone = get_object_or_404(Milestone, pk=milestone_id)
     issue.milestone = milestone
     issue.save()
+    messages.success(
+        request, f'The milestone "{milestone.title}" was successfully set!')
     return redirect(reverse('issue-detail', args=[issue_id]))
 
 
@@ -455,8 +451,11 @@ def set_milestone(request, issue_id, milestone_id):
 @test_issue_permissions
 def clear_milestone(request, issue_id, milestone_id):
     issue = get_object_or_404(Issue, pk=issue_id)
+    milestone = get_object_or_404(Milestone, pk=milestone_id)
     issue.milestone = None
     issue.save()
+    messages.success(
+        request, f'The milestone "{milestone.title}" was successfully cleared!')
     return redirect(reverse('issue-detail', args=[issue_id]))
 
 
@@ -479,6 +478,8 @@ def apply_label(request, issue_id, label_id):
     label = get_object_or_404(Label, pk=label_id)
     issue.labels.add(label)
     issue.save()
+    messages.success(
+        request, f'The label "{label.title}" was successfully applied!')
     return redirect(reverse('issue-detail', args=[issue_id]))
 
 
@@ -486,8 +487,11 @@ def apply_label(request, issue_id, label_id):
 @test_issue_permissions
 def remove_label(request, issue_id, label_id):
     issue = get_object_or_404(Issue, pk=issue_id)
+    label = get_object_or_404(Label, pk=label_id)
     issue.labels.set(issue.labels.exclude(id=label_id))
     issue.save()
+    messages.success(
+        request, f'The label "{label.title}" was successfully removed!')
     return redirect(reverse('issue-detail', args=[issue_id]))
 
 
@@ -512,6 +516,8 @@ def add_assignee(request, issue_id, assignee_id):
     assignee = get_object_or_404(User, pk=assignee_id)
     issue.assignees.add(assignee)
     issue.save()
+    messages.success(
+        request, f'The assignee "{assignee.username}" was successfully added!')
     return redirect(reverse('issue-detail', args=[issue_id]))
 
 
@@ -519,8 +525,11 @@ def add_assignee(request, issue_id, assignee_id):
 @test_issue_permissions
 def remove_assignee(request, issue_id, assignee_id):
     issue = get_object_or_404(Issue, pk=issue_id)
+    assignee = get_object_or_404(User, pk=assignee_id)
     issue.assignees.set(issue.assignees.exclude(id=assignee_id))
     issue.save()
+    messages.success(
+        request, f'The assignee "{assignee.username}" was successfully removed!')
     return redirect(reverse('issue-detail', args=[issue_id]))
 
 
@@ -531,6 +540,8 @@ def close_issue(request, issue_id):
     issue.is_open = False
     issue.date_closed = timezone.now()
     issue.save()
+    messages.success(
+        request, f'The issue "{issue.title}" was successfully closed!')
     return redirect(reverse('issue-detail', args=[issue_id]))
 
 
@@ -540,6 +551,8 @@ def reopen_issue(request, issue_id):
     issue = get_object_or_404(Issue, pk=issue_id)
     issue.is_open = True
     issue.save()
+    messages.success(
+        request, f'The issue "{issue.title}" was successfully reopened!')
     return redirect(reverse('issue-detail', args=[issue_id]))
 
 
@@ -549,6 +562,8 @@ def close_milestone(request, milestone_id):
     milestone = get_object_or_404(Milestone, pk=milestone_id)
     milestone.is_open = False
     milestone.save()
+    messages.success(
+        request, f'The milestone "{milestone.title}" was successfully closed!')
     return redirect(reverse('project-detail', args=[milestone.project.id]))
 
 
@@ -558,4 +573,6 @@ def reopen_milestone(request, milestone_id):
     milestone = get_object_or_404(Milestone, pk=milestone_id)
     milestone.is_open = True
     milestone.save()
+    messages.success(
+        request, f'The milestone "{milestone.title}" was successfully reopened!')
     return redirect(reverse('project-detail', args=[milestone.project.id]))
