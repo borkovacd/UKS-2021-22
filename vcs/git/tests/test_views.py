@@ -1,10 +1,9 @@
-from asyncio import constants
-from cProfile import label
+
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 from django.contrib.auth.models import User
-from git.models import Label, Milestone, Project, Issue
+from git.models import Milestone, Project, Issue
 from colorfield.fields import ColorField
 from colorful.fields import RGBColorField
 
@@ -580,130 +579,6 @@ class MilestoneDeleteViewTest(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(Milestone.objects.all().count(), 0)
 
-
-# class LabelCreateViewTest(TestCase):
-#     @classmethod
-#     def setUpTestData(self):
-#         self.test_user = User.objects.create_user(
-#             username=TEST_USER_USERNAME,
-#             email=TEST_USER_EMAIL,
-#             password=TEST_USER_PASSWORD)
-
-#         self.test_project = Project.objects.create(
-#             title=TEST_TITLE,
-#             description=TEST_DESCRIPTION,
-#             git_repo=TEST_GIT_REPO,
-#             date_created=timezone.now(),
-#             owner=self.test_user)
-
-#     def test_redirect_if_not_logged_in(self):
-#         response = self.client.get(
-#             reverse('label-create', args=[self.test_project.id]))
-#         self.assertRedirects(
-#             response, f'/login/?next=/project/{self.test_project.id}/new-label/')
-
-#     def test_view_url_exists_at_desired_location(self):
-#         login = self.client.login(
-#             username=TEST_USER_USERNAME, password=TEST_USER_PASSWORD)
-#         response = self.client.get(
-#             f'/project/{self.test_project.id}/new-label/')
-#         self.assertEqual(response.status_code, 200)
-
-#     def test_view_url_accessible_by_name(self):
-#         login = self.client.login(
-#             username=TEST_USER_USERNAME, password=TEST_USER_PASSWORD)
-#         response = self.client.get(
-#             reverse('label-create', args=[self.test_project.id]))
-#         self.assertEqual(response.status_code, 200)
-
-#     def test_view_uses_correct_template(self):
-#         login = self.client.login(
-#             username=TEST_USER_USERNAME, password=TEST_USER_PASSWORD)
-#         response = self.client.get(
-#             reverse('label-create', args=[self.test_project.id]))
-#         self.assertTemplateUsed(response, 'git/label_form.html')
-
-    # def test_given_valid_data_then_label_created_successfully(self):
-    #     login = self.client.login(
-    #         username=TEST_USER_USERNAME, password=TEST_USER_PASSWORD)
-    #     response = self.client.post(
-    #         reverse('label-create', args=[self.test_project.id]),
-    #         {
-    #             'title': TEST_TITLE,
-    #             'color': RGBColorField(),
-    #             'description': TEST_DESCRIPTION,
-    #         })
-    #     self.assertEqual(response.status_code, 302)
-    #     self.assertEqual(Label.objects.all().count(), 1)
-    #     self.assertEqual(Label.objects.last().title, TEST_TITLE)
-
-    #     self.assertEqual(Label.objects.last().description,
-    #                      TEST_DESCRIPTION)
-    #     self.assertEqual(
-    #         Label.objects.last().project.id, self.test_project.id)
-
-
-# class LabelUpdateViewTest(TestCase):
-
-#     @classmethod
-#     def setUpTestData(self):
-#         self.test_user = User.objects.create_user(
-#             username=TEST_USER_USERNAME,
-#             email=TEST_USER_EMAIL,
-#             password=TEST_USER_PASSWORD)
-
-#         self.test_project = Project.objects.create(
-#             title=TEST_TITLE,
-#             description=TEST_DESCRIPTION,
-#             git_repo=TEST_GIT_REPO,
-#             date_created=timezone.now(),
-#             owner=self.test_user)
-
-#         self.test_label = Label.objects.create(
-#             title=TEST_TITLE,
-#             description=TEST_DESCRIPTION,
-#             color=RGBColorField(),
-#             project=self.test_project
-#         )
-
-#         User.objects.create_user(
-#             username=TEST_USER_USERNAME+'2',
-#             email='testUser2@test.com',
-#             password=TEST_USER_PASSWORD)
-
-#     def test_redirect_if_not_logged_in(self):
-#         response = self.client.get(
-#             reverse('label-update', args=[self.test_label.id]))
-#         self.assertRedirects(
-#             response, f'/login/?next=/label/{self.test_label.id}/update/')
-
-#     def test_view_forbidden_if_user_not_owner(self):
-#         login = self.client.login(
-#             username=TEST_USER_USERNAME+'2', password=TEST_USER_PASSWORD)
-#         response = self.client.get(
-#             f'/label/{self.test_label.id}/update/')
-#         self.assertEqual(response.status_code, 403)
-
-#     def test_view_url_exists_at_desired_location(self):
-#         login = self.client.login(
-#             username=TEST_USER_USERNAME, password=TEST_USER_PASSWORD)
-#         response = self.client.get(
-#             f'/label/{self.test_label.id}/update/')
-#         self.assertEqual(response.status_code, 200)
-
-#     def test_view_url_accessible_by_name(self):
-#         login = self.client.login(
-#             username=TEST_USER_USERNAME, password=TEST_USER_PASSWORD)
-#         response = self.client.get(
-#             reverse('label-update', args=[self.test_label.id]))
-#         self.assertEqual(response.status_code, 200)
-
-#     def test_view_uses_correct_template(self):
-#         login = self.client.login(
-#             username=TEST_USER_USERNAME, password=TEST_USER_PASSWORD)
-#         response = self.client.get(
-#             reverse('label-update', args=[self.test_label.id]))
-#         self.assertTemplateUsed(response, 'git/label_form.html')
 
 class IssueCreateViewTest(TestCase):
     @classmethod
